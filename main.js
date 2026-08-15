@@ -148,6 +148,7 @@ stage.canvas.addEventListener("pointerleave", () => wrap.classList.remove("show-
 brush.addEventListener("input", () => wrap.classList.remove("show-ghost"));
 
 stage.canvas.addEventListener("pointerdown", (event) => {
+  event.preventDefault(); // keep the touch, do not let the page take it
   const { x, y } = cellUnder(event);
   if (tool.value === "erase") {
     dragging = true;
@@ -160,6 +161,7 @@ stage.canvas.addEventListener("pointerdown", (event) => {
 
 stage.canvas.addEventListener("pointermove", (event) => {
   if (!dragging) return;
+  event.preventDefault();
   const { x, y } = cellUnder(event);
   colony.erase(x, y, Number(brush.value));
 });

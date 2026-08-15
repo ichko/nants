@@ -1,4 +1,4 @@
-# Leniaghton — web demo
+# nants — neural ants, in the browser
 
 Serve the folder and open it — the page uses ES modules, which Chrome refuses to
 load straight off `file://`:
@@ -60,12 +60,12 @@ once, dark for low values and pale for high.
 | `view.js` | WebGL2 drawing for the field and the channel strip |
 | `main.js` | controls and the animation loop |
 | `weights.js` | the trained brain, base64 float32 |
-| `export_weights.py` | regenerates `weights.js` from a run folder |
+| `serve.py` | a local server with caching off |
 
 To point the demo at a different training run:
 
 ```
-uv run python demo/export_weights.py out/<run-folder>
+uv run nants-weights out/<run-folder> <this-folder>
 ```
 
 The port is checked against the python: the sensed vector agrees to 4e-7 and the
