@@ -118,72 +118,89 @@ function tick(now) {
   requestAnimationFrame(tick);
 }
 
-// ---- pointer -------------------------------------------------------------
+// ---- input ---------------------------------------------------------------
+// mouse and touch are wired separately. pointer events are tidier but a phone
+// keeps handing the drag to the page, so touch is taken directly and swallowed.
 
-function cellUnder(event) {
+const wrap = dom("fieldWrap");
+const ghost = dom("ghost");
+let dragging = false;
+
+function cellAt(clientX, clientY) {
   const box = stage.canvas.getBoundingClientRect();
   return {
-    x: Math.floor(((event.clientX - box.left) / box.width) * SIZE),
-    y: Math.floor(((event.clientY - box.top) / box.height) * SIZE),
+    x: Math.floor(((clientX - box.left) / box.width) * SIZE),
+    y: Math.floor(((clientY - box.top) / box.height) * SIZE),
   };
 }
 
-let dragging = false;
-const wrap = dom("fieldWrap");
-const ghost = dom("ghost");
-
-// show the eraser faintly, so you can see what you are about to remove
-function showGhost(event) {
+// the eraser, shown faintly where the finger or pointer is
+function showGhost(clientX, clientY) {
   if (tool.value !== "erase") {
     wrap.classList.remove("show-ghost");
-    stage.canvas.style.cursor = "crosshair";
     return;
   }
   const box = stage.canvas.getBoundingClientRect();
-  const cell = box.width / SIZE;
-  const across = (Number(brush.value) * 2 + 1) * cell;
+  const nest = wrap.getBoundingClientRect();
+  const across = (Number(brush.value) * 2 + 1) * (box.width / SIZE);
 
   wrap.classList.add("show-ghost");
-  stage.canvas.style.cursor = "none";
   ghost.style.width = `${across}px`;
   ghost.style.height = `${across}px`;
-  ghost.style.left = `${event.clientX - box.left + (box.left - wrap.getBoundingClientRect().left)}px`;
-  ghost.style.top = `${event.clientY - box.top + (box.top - wrap.getBoundingClientRect().top)}px`;
+  ghost.style.left = `${clientX - nest.left}px`;
+  ghost.style.top = `${clientY - nest.top}px`;
 }
 
-// touch listeners are passive by default, so say otherwise and swallow the gesture
-for (const kind of ["touchstart", "touchmove"]) {
-  stage.canvas.addEventListener(kind, (event) => event.preventDefault(),
-                                { passive: false });
-}
-
-stage.canvas.addEventListener("pointermove", showGhost);
-stage.canvas.addEventListener("pointerenter", showGhost);
-stage.canvas.addEventListener("pointerleave", () => wrap.classList.remove("show-ghost"));
-brush.addEventListener("input", () => wrap.classList.remove("show-ghost"));
-
-stage.canvas.addEventListener("pointerdown", (event) => {
-  event.preventDefault(); // keep the touch, do not let the page take it
-  const { x, y } = cellUnder(event);
+function press(clientX, clientY) {
+  const { x, y } = cellAt(clientX, clientY);
   if (tool.value === "erase") {
     dragging = true;
-    stage.canvas.setPointerCapture(event.pointerId);
     colony.erase(x, y, Number(brush.value));
   } else {
     seedAt(x, y);
   }
-});
-
-stage.canvas.addEventListener("pointermove", (event) => {
-  if (!dragging) return;
-  event.preventDefault();
-  const { x, y } = cellUnder(event);
-  colony.erase(x, y, Number(brush.value));
-});
-
-for (const done of ["pointerup", "pointercancel", "pointerleave"]) {
-  stage.canvas.addEventListener(done, () => { dragging = false; });
+  showGhost(clientX, clientY);
 }
+
+function drag(clientX, clientY) {
+  showGhost(clientX, clientY);
+  if (!dragging) return;
+  const { x, y } = cellAt(clientX, clientY);
+  colony.erase(x, y, Number(brush.value));
+}
+
+const canvas = stage.canvas;
+
+// ---- touch: taken directly, and never handed on to the page
+canvas.addEventListener("touchstart", (event) => {
+  event.preventDefault();
+  const touch = event.changedTouches[0];
+  press(touch.clientX, touch.clientY);
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (event) => {
+  event.preventDefault();
+  const touch = event.changedTouches[0];
+  drag(touch.clientX, touch.clientY);
+}, { passive: false });
+
+for (const kind of ["touchend", "touchcancel"]) {
+  canvas.addEventListener(kind, (event) => {
+    event.preventDefault();
+    dragging = false;
+    wrap.classList.remove("show-ghost");
+  }, { passive: false });
+}
+
+// ---- mouse
+canvas.addEventListener("mousedown", (event) => press(event.clientX, event.clientY));
+canvas.addEventListener("mousemove", (event) => drag(event.clientX, event.clientY));
+canvas.addEventListener("mouseleave", () => {
+  dragging = false;
+  wrap.classList.remove("show-ghost");
+});
+window.addEventListener("mouseup", () => { dragging = false; });
+brush.addEventListener("input", () => wrap.classList.remove("show-ghost"));
 
 // ---- buttons -------------------------------------------------------------
 
