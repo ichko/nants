@@ -99,7 +99,7 @@ canvas {
   image-rendering: pixelated;
 }
 #strip {
-  height: 46px;
+  height: 46px;  /* replaced from script, so the channels stay square */
   border: none;
   background: var(--rule);  /* shows through as the hairlines between channels */
 }
@@ -262,7 +262,7 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 
 .ticks {
   display: grid;
-  grid-template-columns: repeat(13, 1fr);
+  grid-template-columns: repeat(13, 1fr);  /* script overrides when it wraps */
   margin: 4px 0 0;
   padding: 0;
   list-style: none;
