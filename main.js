@@ -3,6 +3,15 @@
 import { Colony, SIZE, CELL } from "./sim.js";
 import { View } from "./view.js";
 
+// if anything below throws, say so on the page: a phone has no console
+window.addEventListener("error", (event) => {
+  const box = document.getElementById("trouble");
+  if (box) {
+    box.textContent = `${event.message}`;
+    box.classList.add("shown");
+  }
+});
+
 const RAMP = [[0.13, 0.11, 0.09], [0.99, 0.87, 0.73]]; // ink to the alife sand
 const MAPLE = [0.69, 0.01, 0.0]; // #b00300
 

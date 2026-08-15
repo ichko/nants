@@ -111,12 +111,28 @@ canvas {
 }
 #stage { aspect-ratio: 1; cursor: none; }
 
-/* a drag on any of these is for the demo, not for scrolling the page */
+/* a drag anywhere on the field card is for the demo, not for scrolling */
+.stage-panel,
 #stage,
 .field-wrap,
 input[type="range"] {
   touch-action: none;
 }
+body { overscroll-behavior: contain; }
+
+/* shown only if the script fails, so a phone can report what went wrong */
+#trouble {
+  display: none;
+  margin: 8px 0 0;
+  padding: 8px;
+  border-radius: 5px;
+  background: var(--red);
+  color: #fff;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px;
+  word-break: break-word;
+}
+#trouble.shown { display: block; }
 
 /* the eraser, shown faintly where the pointer is */
 #ghost {
