@@ -36,7 +36,7 @@ toolBar.addEventListener("click", (event) => {
 });
 const playing = { on: true };
 
-const HOLD = 500;    // stand still this long at the start
+const HOLD = 0;      // no waiting about: the ramp is gentle enough on its own
 const WINDUP = 7000; // then wind up to CRUISE over this long
 const CRUISE = 500;  // steps a second, until the slider is touched
 const REDRAW = 120;  // never draw more often than this, however fast the screen

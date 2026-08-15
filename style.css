@@ -35,7 +35,20 @@ body {
 }
 
 h1, h2 { margin: 0; font-weight: 600; }
-h1 { font-size: 17px; letter-spacing: 0.01em; }
+h1 {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  font-size: 27px;
+  letter-spacing: 0.01em;
+}
+h1 .loud { color: #fff; }
+h1 .quiet {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--sand);
+  letter-spacing: 0.06em;
+}
 h2 {
   font-size: 11px;
   text-transform: uppercase;
@@ -54,7 +67,10 @@ h2 {
   color: var(--sand);
 }
 .bar h1 { color: #fff; }
-.bar p { margin: 0; font-size: 12px; color: var(--sand); opacity: 0.88; }
+.bar p { margin: 0; font-size: 12px; color: var(--sand); opacity: 0.9; }
+.bar .lede { max-width: 46em; font-size: 13.5px; line-height: 1.5; }
+.bar a { color: #fff; }
+.bar a:hover { color: var(--sand); }
 .foot {
   margin-top: 12px;
   padding: 10px 2px 2px;
@@ -111,13 +127,15 @@ canvas {
 }
 #stage { aspect-ratio: 1; cursor: none; }
 
-/* a drag anywhere on the field card is for the demo, not for scrolling */
-.stage-panel,
+/* only the field itself swallows gestures, so the rest of the page can be
+   scrolled, selected and copied as usual */
 #stage,
 .field-wrap,
 input[type="range"] {
   touch-action: none;
 }
+#stage, .field-wrap { user-select: none; -webkit-user-select: none; }
+body, p, li, code, pre, h1, h2 { user-select: text; -webkit-user-select: text; }
 body { overscroll-behavior: contain; }
 
 /* shown only if the script fails, so a phone can report what went wrong */
@@ -272,3 +290,43 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
   text-align: center;
 }
 .ticks .rgb { color: var(--red); font-weight: 700; }
+
+/* ---- the written bits ---- */
+
+.prose { margin-top: 10px; }
+.prose h2 { margin-bottom: 8px; }
+.prose p { margin: 0 0 9px; font-size: 13px; max-width: 62em; }
+.prose a { color: var(--red); }
+.prose a:hover { color: var(--red-deep); }
+
+.diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 4px 0 12px;
+}
+.diagram .head { font: 600 12px "Iowan Old Style", Georgia, serif; fill: var(--ink); }
+.diagram .cap { font: 600 11px "Iowan Old Style", Georgia, serif; fill: var(--red); }
+.diagram .sub { font: 10.5px ui-monospace, Menlo, monospace; fill: var(--faded); }
+.diagram .big { font-size: 26px; }
+
+.points { margin: 0; padding-left: 18px; font-size: 13px; max-width: 62em; }
+.points li { margin-bottom: 5px; }
+.points b { color: var(--red-deep); }
+
+pre {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #2b2320;
+  color: #f3ece2;
+  overflow-x: auto;
+  font-size: 12px;
+  line-height: 1.6;
+}
+pre code { font-family: ui-monospace, Menlo, monospace; }
+pre .said { color: #a99b8b; }
+code { font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+p code { padding: 1px 4px; border-radius: 3px; background: var(--wash); }
+
+.foot a { text-decoration: none; border-bottom: 1px solid rgba(255, 255, 255, 0.4); }
