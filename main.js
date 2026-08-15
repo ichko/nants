@@ -24,7 +24,6 @@ const speed = dom("speed");
 const crowd = dom("crowd");
 const brush = dom("brush");
 const spin = dom("spin");
-const ticks = dom("ticks");
 const tool = { value: "erase" };
 const toolBar = dom("tool");
 toolBar.addEventListener("click", (event) => {
@@ -85,28 +84,25 @@ function paint() {
   const rush = Math.min(Number(speed.value) / Number(speed.max), 1);
   stage.ants(colony.ants, MAPLE, 1.1, 1 - 0.9 * rush);
 
-  // the scratch channels, kept square: one row when there is room, two when not
+  // the scratch channels: one row, square, with the same gap on every side
   const shown = CELL - 3;
   const across = strip.canvas.clientWidth;
-  const cols = across < 520 ? Math.ceil(shown / 2) : shown;
-  const rows = Math.ceil(shown / cols);
+  const gap = 3; // screen pixels, the same between panels and round the edge
+  const panel = (across - gap * (shown + 1)) / shown;
 
-  strip.canvas.style.height = `${Math.round((across / cols) * rows)}px`;
+  strip.canvas.style.height = `${Math.round(panel + gap * 2)}px`;
   strip.fit();
   strip.upload(colony.field);
 
-  const gap = 0.004;
-  const wide = (2 - gap * (cols - 1)) / cols;
-  const tall = (2 - gap * (rows - 1)) / rows;
-  for (let i = 0; i < shown; i++) {
-    const c = i % cols;
-    const r = Math.floor(i / cols);
-    strip.panel([-1 + c * (wide + gap), 1 - (r + 1) * tall - r * gap, wide, tall], i + 3);
-  }
+  // the same pixel gap is a different amount of clip space across and down
+  const tall = strip.canvas.clientHeight || panel + gap * 2;
+  const stepX = (panel / across) * 2;
+  const gapX = (gap / across) * 2;
+  const stepY = (panel / tall) * 2;
+  const gapY = (gap / tall) * 2;
 
-  if (ticks.dataset.cols !== String(cols)) {
-    ticks.dataset.cols = cols;
-    ticks.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  for (let i = 0; i < shown; i++) {
+    strip.panel([-1 + gapX + i * (stepX + gapX), -1 + gapY, stepX, stepY], i + 3);
   }
 
   dom("stepCount").textContent = colony.t.toLocaleString();

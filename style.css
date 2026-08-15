@@ -262,7 +262,7 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 
 .ticks {
   display: grid;
-  grid-template-columns: repeat(13, 1fr);  /* script overrides when it wraps */
+  grid-template-columns: repeat(13, 1fr);
   margin: 4px 0 0;
   padding: 0;
   list-style: none;
