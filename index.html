@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leniaghton — an ant colony that paints 🦎</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="bar">
+  <h1>🍁 Leniaghton</h1>
+  <p>A colony of memoryless ants, each one painting a gecko from dead reckoning alone.</p>
+</header>
+
+<main class="board">
+
+  <section class="panel stage-panel">
+    <div class="panel-top">
+      <h2>The field</h2>
+      <dl class="readout">
+        <div><dt>step</dt><dd id="stepCount">0</dd></div>
+        <div><dt>ants</dt><dd id="antCount">0</dd></div>
+      </dl>
+    </div>
+    <div class="field-wrap" id="fieldWrap">
+      <canvas id="stage" width="480" height="480"></canvas>
+      <div id="ghost"></div>
+    </div>
+    <p class="hint" id="hintLine">Drag to cut pieces away 🧽 · switch to ants to start a new colony</p>
+  </section>
+
+  <section class="panel controls">
+    <h2>Controls</h2>
+
+    <label class="row">
+      <span>speed <b id="speedRead">0/s</b></span>
+      <input id="speed" type="range" min="0" max="1200" value="0" step="1">
+    </label>
+
+    <div class="row">
+      <span>pointer does</span>
+      <div class="toggle" id="tool" role="group">
+        <button type="button" data-tool="erase" class="is-on">🧽 erase</button>
+        <button type="button" data-tool="seed">🐜 ants</button>
+      </div>
+    </div>
+
+    <label class="row">
+      <span>ants per drop <b id="crowdRead">8</b></span>
+      <input id="crowd" type="range" min="1" max="16" value="8" step="1">
+    </label>
+
+    <label class="row">
+      <span>eraser size</span>
+      <input id="brush" type="range" min="1" max="12" value="5" step="1">
+    </label>
+
+    <label class="row tick">
+      <input id="spin" type="checkbox">
+      <span>random facing (breaks the colony's shared frame)</span>
+    </label>
+
+    <div class="buttons">
+      <button id="play" class="is-on">⏸ pause</button>
+      <button id="once">↷ nudge</button>
+      <button id="restart">🍁 restart</button>
+      <button id="clear">🧹 clear</button>
+    </div>
+
+    <p class="note">
+      Every ant sees only its own 3×3 patch, how far it has walked from where it
+      woke up, and how far through the run the clock is. No memory, no map, no
+      talking. Drop a second crowd anywhere and it will build its own gecko
+      around <em>that</em> spot.
+    </p>
+  </section>
+
+</main>
+
+<section class="panel strip-panel">
+  <div class="panel-top">
+    <h2>Inside the cells</h2>
+    <p class="legend">channels 3–15 · the ants' own scratch space</p>
+  </div>
+  <canvas id="strip" width="1024" height="72"></canvas>
+  <ol class="ticks" id="ticks"></ol>
+</section>
+
+<footer class="bar foot">
+  <p>Trained for ALIFE 2026 · Waterloo, Ontario 🇨🇦 · webgl + a 14k parameter brain</p>
+</footer>
+
+<script src="weights.js"></script>
+<script type="module" src="main.js"></script>
+<script>
+  const ticks = document.getElementById("ticks");
+  for (let c = 3; c < 16; c++) {
+    const item = document.createElement("li");
+    item.textContent = c;
+    ticks.appendChild(item);
+  }
+  const crowd = document.getElementById("crowd");
+  const crowdRead = document.getElementById("crowdRead");
+  crowd.addEventListener("input", () => { crowdRead.textContent = crowd.value; });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,251 @@
+/* Strong red ground, white cards, sand accents.
+   Palette taken from the ALIFE 2026 site: #b00300 with #fcdeb9. */
+
+:root {
+  --red: #b00300;
+  --red-deep: #7d0200;
+  --red-lift: #c9241f;   /* one step brighter, for rules drawn on red */
+  --sand: #fcdeb9;
+  --sand-deep: #efe2d0;
+  --card: #ffffff;
+  --ink: #241d19;
+  --faded: #7b6f66;
+  --rule: #e8dccb;
+  --round: 8px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0 auto;
+  padding: 14px;
+  max-width: 700px;
+
+  /* a faint grid of dots with a whisper of noise over it */
+  background-color: var(--red);
+  background-image:
+    url("noise.svg"),
+    radial-gradient(circle at 1px 1px, rgba(252, 222, 185, 0.16) 1px, transparent 0),
+    radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.10) 1px, transparent 0);
+  background-size: 140px 140px, 12px 12px, 12px 12px;
+  background-position: 0 0, 0 0, 6px 6px;
+  background-attachment: fixed;
+  color: var(--ink);
+  font: 14px/1.45 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+h1, h2 { margin: 0; font-weight: 600; }
+h1 { font-size: 17px; letter-spacing: 0.01em; }
+h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  color: var(--faded);
+}
+
+/* ---- the bars, straight on the red ---- */
+
+.bar {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 4px 2px 10px;
+  color: var(--sand);
+}
+.bar h1 { color: #fff; }
+.bar p { margin: 0; font-size: 12px; color: var(--sand); opacity: 0.88; }
+.foot {
+  margin-top: 12px;
+  padding: 10px 2px 2px;
+  border-top: 1px solid var(--red-lift);
+}
+
+/* ---- cards ---- */
+
+.board {
+  display: grid;
+  grid-template-columns: 384px 1fr;
+  gap: 10px;
+}
+@media (max-width: 640px) { .board { grid-template-columns: 1fr; } }
+
+.panel {
+  padding: 10px;
+  background: var(--card);
+  border-radius: var(--round);
+  box-shadow: 4px 4px 0 var(--red-deep);   /* hard edged, no blur, no spread */
+}
+.strip-panel { margin-top: 10px; }
+
+.panel-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--sand);
+}
+
+/* ---- canvases ---- */
+
+canvas {
+  display: block;
+  width: 100%;
+  background: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  image-rendering: pixelated;
+}
+#strip {
+  height: 46px;
+  border: none;
+  background: var(--rule);  /* shows through as the hairlines between channels */
+}
+
+.field-wrap {
+  position: relative;
+  max-width: 358px;
+  margin: 0 auto;
+}
+#stage { aspect-ratio: 1; cursor: none; }
+
+/* the eraser, shown faintly where the pointer is */
+#ghost {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(176, 3, 0, 0.28);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+.field-wrap.show-ghost #ghost { display: block; }
+
+.hint { margin: 8px 0 0; font-size: 11.5px; color: var(--faded); }
+
+/* ---- readout ---- */
+
+.readout {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 0;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+.readout div { display: flex; align-items: baseline; gap: 5px; }
+.readout dt {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--faded);
+}
+.readout dd { margin: 0; font-size: 13px; font-weight: 700; color: var(--red); }
+
+/* ---- controls ---- */
+
+.controls .row { display: block; margin: 0 0 9px; font-size: 11.5px; color: var(--faded); }
+.controls .row > span { display: block; margin-bottom: 4px; }
+.controls .row b { color: var(--ink); font-family: ui-monospace, Menlo, monospace; }
+.row.tick { display: flex; align-items: flex-start; gap: 7px; }
+.row.tick span { margin: 0; }
+.row.tick input { accent-color: var(--red); margin-top: 2px; }
+
+input[type="range"] {
+  width: 100%;
+  height: 16px;
+  appearance: none;
+  background: transparent;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--sand);
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 2px solid var(--card);
+  box-shadow: 1px 1px 0 var(--red-deep);
+  cursor: grab;
+}
+input[type="range"]::-moz-range-track { height: 5px; border-radius: 3px; background: var(--sand); }
+input[type="range"]::-moz-range-thumb {
+  width: 13px; height: 13px; border-radius: 50%;
+  background: var(--red); border: 2px solid var(--card); cursor: grab;
+}
+
+button {
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--red-deep);
+  background: var(--sand);
+  border: 1px solid var(--sand-deep);
+  border-radius: 5px;
+  padding: 5px 8px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--sand-deep);
+  transition: background 90ms linear, color 90ms linear;
+}
+button:hover {
+  background: var(--red);
+  border-color: var(--red-deep);
+  color: #fff;
+  box-shadow: 2px 2px 0 var(--red-deep);
+}
+button:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--red-deep); }
+button.is-on {
+  background: var(--red);
+  border-color: var(--red-deep);
+  color: #fff;
+  box-shadow: 2px 2px 0 var(--red-deep);
+}
+button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--ink); }
+:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+
+.toggle { display: grid; grid-template-columns: 1fr 1fr; }
+.toggle button { border-radius: 0; border-right-width: 0; box-shadow: none; }
+.toggle { box-shadow: 2px 2px 0 var(--sand-deep); border-radius: 5px; }
+.toggle button:first-child { border-radius: 5px 0 0 5px; }
+.toggle button:last-child { border-radius: 0 5px 5px 0; border-right-width: 1px; }
+
+.buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+
+.note {
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+  font-size: 11.5px;
+  color: var(--faded);
+}
+
+/* ---- channel strip ---- */
+
+.legend { margin: 0; font-size: 10.5px; color: var(--faded); }
+.swatch {
+  display: inline-block;
+  width: 9px; height: 9px;
+  margin: 0 3px 0 10px;
+  border-radius: 2px;
+  vertical-align: -1px;
+}
+.swatch.rgb { background: var(--red); }
+.swatch.hidden { background: var(--sand); border: 1px solid var(--sand-deep); }
+
+.ticks {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 9.5px;
+  color: var(--faded);
+  text-align: center;
+}
+.ticks .rgb { color: var(--red); font-weight: 700; }
