@@ -109,10 +109,13 @@ canvas {
   max-width: 358px;
   margin: 0 auto;
 }
-#stage {
-  aspect-ratio: 1;
-  cursor: none;
-  touch-action: none;  /* a drag here paints, it does not scroll the page */
+#stage { aspect-ratio: 1; cursor: none; }
+
+/* a drag on any of these is for the demo, not for scrolling the page */
+#stage,
+.field-wrap,
+input[type="range"] {
+  touch-action: none;
 }
 
 /* the eraser, shown faintly where the pointer is */

@@ -142,6 +142,12 @@ function showGhost(event) {
   ghost.style.top = `${event.clientY - box.top + (box.top - wrap.getBoundingClientRect().top)}px`;
 }
 
+// touch listeners are passive by default, so say otherwise and swallow the gesture
+for (const kind of ["touchstart", "touchmove"]) {
+  stage.canvas.addEventListener(kind, (event) => event.preventDefault(),
+                                { passive: false });
+}
+
 stage.canvas.addEventListener("pointermove", showGhost);
 stage.canvas.addEventListener("pointerenter", showGhost);
 stage.canvas.addEventListener("pointerleave", () => wrap.classList.remove("show-ghost"));
