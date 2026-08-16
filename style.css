@@ -14,7 +14,7 @@
   --round: 8px;
 
   --display: "Fraunces", "Iowan Old Style", Georgia, serif;
-  --text: "Inter", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, sans-serif;
+  --text: "DM Sans", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, sans-serif;
   --mono: "JetBrains Mono", var(--mono);
 }
 
@@ -29,8 +29,8 @@ body {
   background-color: var(--red);
   background-image:
     url("noise.svg"),
-    radial-gradient(circle at 1px 1px, rgba(252, 222, 185, 0.16) 1px, transparent 0),
-    radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.10) 1px, transparent 0);
+    radial-gradient(circle at 1px 1px, rgba(252, 222, 185, 0.10) 1px, transparent 0),
+    radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.07) 1px, transparent 0);
   background-size: 140px 140px, 12px 12px, 12px 12px;
   background-position: 0 0, 0 0, 6px 6px;
   background-attachment: fixed;
@@ -44,9 +44,9 @@ h1 {
   align-items: baseline;
   gap: 10px;
   font-family: var(--display);
-  font-size: 31px;
-  font-weight: 700;
-  letter-spacing: -0.015em;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: 0;
 }
 h1 .loud { color: #fff; }
 h1 .quiet {
