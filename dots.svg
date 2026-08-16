@@ -1,24 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72">
-  <filter id="speck">
-    <!-- stitched, so the grain carries across the tile without a seam -->
-    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3"
-                  stitchTiles="stitch" seed="4"/>
-    <feColorMatrix type="saturate" values="0"/>
-  </filter>
-  <filter id="soft"><feGaussianBlur stdDeviation="0.5"/></filter>
-
-  <rect width="72" height="72" filter="url(#speck)" opacity="0.05"/>
-
   <!-- a loose scatter of dots, off the grid on purpose, so paper reads as
        woven rather than ruled -->
-  <g fill="#241d19" opacity="0.08" filter="url(#soft)">
-    <circle cx="9"  cy="14" r="1.3"/>
-    <circle cx="41" cy="6"  r="1.3"/>
-    <circle cx="63" cy="27" r="1.3"/>
-    <circle cx="26" cy="35" r="1.3"/>
-    <circle cx="52" cy="49" r="1.3"/>
-    <circle cx="14" cy="60" r="1.3"/>
-    <circle cx="37" cy="68" r="1.3"/>
-    <circle cx="68" cy="57" r="1.3"/>
+  <g fill="#191614" opacity="0.075">
+    <circle cx="9"  cy="14" r="1.1"/>
+    <circle cx="41" cy="6"  r="1.1"/>
+    <circle cx="63" cy="27" r="1.1"/>
+    <circle cx="26" cy="35" r="1.1"/>
+    <circle cx="52" cy="49" r="1.1"/>
+    <circle cx="14" cy="60" r="1.1"/>
+    <circle cx="37" cy="68" r="1.1"/>
+    <circle cx="68" cy="57" r="1.1"/>
   </g>
 </svg>
