@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Neural Ants (NAnts) 🐜</title>
+<title>Neural Ants (NAnts)</title>
 <meta name="description" content="A colony of tiny neural networks that walk a grid and draw a picture, with no memory and no map.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Fraunces:opsz,wght@9..144,400;9..144,500&family=JetBrains+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
 
@@ -20,11 +20,14 @@
       <h1>Neural&nbsp;Ants</h1>
       <p class="tag">NAnts</p>
     </div>
-    <p class="credit">
-      <a href="https://www.izhv.eu/">Iliya Zhechev</a>
-      <span>·</span>
-      <a href="https://emergingresearchers.life/">ERA</a>
-    </p>
+    <div class="credit">
+      <span class="who">Authors</span>
+      <p class="names">
+        <a href="https://www.izhv.eu/">Iliya Zhechev</a>
+        <span class="dot">·</span>
+        <a href="https://emergingresearchers.life/">ERA</a>
+      </p>
+    </div>
   </div>
 </header>
 
@@ -63,8 +66,8 @@
         <div class="row">
           <span>pointer</span>
           <div class="toggle" id="tool" role="group">
-            <button type="button" data-tool="erase" class="on">erase</button>
-            <button type="button" data-tool="seed">add ants</button>
+            <button type="button" data-tool="erase" class="is-on">🧽 erase</button>
+            <button type="button" data-tool="seed">🐜 ants</button>
           </div>
         </div>
 
@@ -79,10 +82,10 @@
         </label>
 
         <div class="keys">
-          <button id="play" class="on">pause</button>
-          <button id="once">step</button>
-          <button id="restart">restart</button>
-          <button id="clear">clear</button>
+          <button id="play" class="is-on">⏸ pause</button>
+          <button id="once">↷ nudge</button>
+          <button id="restart">🍁 restart</button>
+          <button id="clear">🧹 clear</button>
         </div>
 
         <p class="tip">
@@ -216,7 +219,7 @@ uv run nants-crowd out/&lt;datetime&gt;</code></pre>
 </footer>
 
 <script src="weights.js"></script>
-<script type="module" src="main.js?v=6"></script>
+<script type="module" src="main.js?v=7"></script>
 <script>
   const ticks = document.getElementById("ticks");
   for (let c = 3; c < 16; c++) {

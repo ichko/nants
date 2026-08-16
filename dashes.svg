@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240">
+  <!-- winding dashed trails, the way an ant leaves them -->
+  <g fill="none" stroke="#ffffff" stroke-opacity="0.11" stroke-width="1.6"
+     stroke-linecap="round" stroke-dasharray="5 9">
+    <path d="M-20 44 C 40 12, 92 78, 150 40 S 236 60, 268 30"/>
+    <path d="M-20 132 C 52 108, 78 176, 142 148 S 214 168, 268 128"/>
+    <path d="M-20 214 C 46 196, 96 246, 158 216 S 222 232, 268 208"/>
+    <path d="M28 -20 C 6 46, 58 96, 34 158 S 60 232, 40 268"/>
+    <path d="M186 -20 C 208 40, 160 104, 190 162 S 172 230, 196 268"/>
+  </g>
+</svg>
