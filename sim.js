@@ -3,7 +3,7 @@
 // then writes to the cell below and turns left, straight on, or right.
 
 const BASE = 48; // the field the ants were trained on, wrapping at the edges
-const MAX = 96;  // zoomed out: four times as many cells in the same box
+const MAX = 256; // zoomed out: many more cells, same box on screen
 const CELL = 16; // channels per cell: 3 visible, 13 the ants' own scratch
 const HORIZON = 6000; // steps the clock is scaled to
 const SPAN = 24; // what the odometer divides by, as trained: never rescaled
