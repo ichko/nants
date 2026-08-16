@@ -91,32 +91,32 @@
   <ol class="ticks" id="ticks"></ol>
 </section>
 
-<section class="panel prose">
+<section class="panel prose inverted">
   <div class="panel-top">
     <h2>How it works</h2>
     <p class="legend">one ant, one step</p>
   </div>
 
-  <ol class="flow">
+  <ol class="trail">
     <li>
-      <span class="num">1</span>
+      <span class="dot">1</span>
       <h3>It looks</h3>
-      <p>At the 3×3 patch under its feet. Nothing further, ever.</p>
+      <p>At its 3×3 patch. Nothing further, ever.</p>
     </li>
     <li>
-      <span class="num">2</span>
+      <span class="dot">2</span>
       <h3>It decides</h3>
-      <p>One small network. 93 numbers in, 128 hidden, 19 out.</p>
+      <p>One small network. 93 numbers in, 19 out.</p>
     </li>
     <li>
-      <span class="num">3</span>
-      <h3>It paints and turns</h3>
-      <p>Adds to the cell below, then turns left, straight on, or right.</p>
+      <span class="dot">3</span>
+      <h3>It paints</h3>
+      <p>Adds to the cell below, then turns.</p>
     </li>
     <li>
-      <span class="num">4</span>
-      <h3>It steps forward</h3>
-      <p>Six thousand times over. A gecko comes out.</p>
+      <span class="dot">4</span>
+      <h3>It walks on</h3>
+      <p>Six thousand times. A gecko appears.</p>
     </li>
   </ol>
 
@@ -126,16 +126,12 @@
   </p>
 
   <ul class="points">
-    <li><b>No memory.</b> Nothing carries from one step to the next. Every
-      decision is made afresh.</li>
-    <li><b>No map.</b> Only the distance walked from its own starting cell, the
-      way an ant counts its steps home.</li>
-    <li><b>No talking.</b> Ants never signal each other. They share a field, and
-      that is all.</li>
-    <li><b>One brain, any crowd.</b> The same 14,483 numbers run every ant. One
-      ant draws the gecko slowly, nine draw it quickly.</li>
-    <li><b>Learned, not written.</b> What to paint comes from backprop. Where to
-      walk comes from trial and error, because a turn cannot be differentiated.</li>
+    <li><b>No memory.</b> Nothing carries from one step to the next.</li>
+    <li><b>No map.</b> Only the distance walked from its own starting cell.</li>
+    <li><b>No talking.</b> Ants share a field, and nothing else.</li>
+    <li><b>One brain, any crowd.</b> The same 14,483 numbers run every ant.</li>
+    <li><b>Learned, not written.</b> Backprop for the painting, trial and error
+      for the walking.</li>
   </ul>
 </section>
 
@@ -145,36 +141,21 @@
     <p class="legend">a couple of hours on a gpu</p>
   </div>
 
-  <ol class="recipe">
-    <li>
-      <span class="num">1</span>
-        <h3>Get it</h3>
-<pre><code>git clone https://github.com/ichko/nants
-cd nants
-uv sync</code></pre>
-    </li>
-    <li>
-      <span class="num">2</span>
-        <h3>Grow something</h3>
-<pre><code>uv run python starter/my_nants.py</code></pre>
-        <p>
-          Change the emoji at the top of <code>starter/my_nants.py</code> to
-          grow something else. It writes a folder under <code>out/</code> you
-          can watch while it works. Stop it whenever you like — the best brain
-          is already saved.
-        </p>
-    </li>
-    <li>
-      <span class="num">3</span>
-        <h3>See what it made</h3>
-<pre><code>uv run nants-crowd out/&lt;datetime&gt;</code></pre>
-        <p>
-          One to nine ants a square, with a piece bitten out halfway to see it
-          grow back. There are seven more of these.
-        </p>
-    </li>
-  </ol>
+<pre><code><span class="said"># get it</span>
+git clone https://github.com/ichko/nants
+cd nants &amp;&amp; uv sync
 
+<span class="said"># change the emoji at the top of the file, then grow it</span>
+uv run python starter/my_nants.py
+
+<span class="said"># see what it made</span>
+uv run nants-crowd out/&lt;datetime&gt;</code></pre>
+
+  <p>
+    It writes a folder under <code>out/</code> you can watch while it works —
+    the picture as it stands, the error curve, and the best brain so far. Stop
+    it whenever you like; the good one is already saved.
+  </p>
   <p class="callout">
     <a href="https://github.com/ichko/nants">The code, and the longer story, on GitHub →</a>
   </p>
