@@ -25,15 +25,10 @@ body {
   padding: 14px;
   max-width: 700px;
 
-  /* a quiet grid of dots, with a whisper of grain over it */
-  background-color: var(--red);
-  background-image:
-    url("noise.svg"),
-    radial-gradient(circle at 1px 1px, rgba(252, 222, 185, 0.10) 1px, transparent 0),
-    radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.07) 1px, transparent 0);
-  background-size: 140px 140px, 12px 12px, 12px 12px;
-  background-position: 0 0, 0 0, 6px 6px;
-  background-attachment: fixed;
+  /* one soft wash of red, brighter at the top, no pattern */
+  background:
+    radial-gradient(120% 90% at 50% 0%, #c01806 0%, var(--red) 45%, #8f0a02 100%)
+    fixed;
   color: var(--ink);
   font: 14px/1.5 var(--text);
 }
@@ -320,61 +315,66 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
    sizes. spacing runs on a strict 4 / 8 / 12 / 16 / 24 scale.            */
 
 .prose {
-  margin-top: 12px;
-  padding: 22px 24px 26px;
+  margin-top: 10px;
+  padding: 14px 15px 16px;
   color: #3c352f;
   --tint: #fdf2de;
   --edge: #f1ddbd;
   --quiet: #6b6058;
 }
-.prose .panel-top { margin-bottom: 16px; padding-bottom: 10px; }
+.prose .panel-top { margin-bottom: 12px; padding-bottom: 8px; }
 .prose h2 { font-size: 12px; letter-spacing: 0.14em; color: var(--red-deep); }
 .prose .legend { font-family: var(--text); font-size: 12px; color: var(--quiet); }
 
 .prose h3 {
-  margin: 0 0 7px;
+  margin: 0 0 5px;
   font-family: var(--text);
-  font-size: 14px;
-  font-weight: 650;
-  letter-spacing: -0.005em;
-  color: var(--red-deep);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
 }
 .prose p {
-  margin: 0 0 12px;
-  font-size: 14px;
-  line-height: 1.65;
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  line-height: 1.6;
   max-width: 58em;
 }
 .prose a { color: var(--red); text-decoration: none; border-bottom: 1px solid var(--edge); }
 .prose a:hover { color: var(--red-deep); border-bottom-color: var(--red); }
 
 .num {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
   margin-bottom: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  color: #fff;
   font-family: var(--mono);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.18em;
-  color: var(--red);
 }
-.num::before { content: "0"; }
 
 /* how it works */
 .flow {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  margin: 0 0 20px;
+  gap: 22px;
+  margin: 0 0 16px;
   padding: 0;
   list-style: none;
 }
 .flow li {
   position: relative;
-  padding: 18px 18px 20px;
-  border-radius: 10px;
-  background: var(--tint);
+  padding: 12px 13px 14px;
+  border: 1px solid var(--edge);
+  border-top: 3px solid var(--sand);
+  border-radius: 7px;
+  background: #fffdf9;
 }
-.flow li p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--quiet); }
+.flow li p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--quiet); }
 .flow li:not(:last-child)::after {
   content: "›";
   position: absolute;
@@ -397,8 +397,8 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 }
 
 .aside {
-  margin: 0 0 24px;
-  padding: 16px 18px;
+  margin: 0 0 16px;
+  padding: 11px 13px;
   border-radius: 10px;
   background: var(--wash);
   border-left: 3px solid var(--sand);
@@ -410,9 +410,9 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 .points { margin: 0; padding: 0; list-style: none; max-width: 58em; }
 .points li {
   position: relative;
-  margin-bottom: 10px;
-  padding-left: 18px;
-  font-size: 14px;
+  margin-bottom: 7px;
+  padding-left: 17px;
+  font-size: 13.5px;
   line-height: 1.6;
   color: var(--quiet);
 }
@@ -432,16 +432,16 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 /* train your own */
 .recipe { margin: 0; padding: 0; list-style: none; }
 .recipe > li {
-  padding-bottom: 20px;
-  margin-bottom: 20px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
   border-bottom: 1px solid var(--edge);
 }
-.recipe > li:last-of-type { border-bottom: none; padding-bottom: 0; margin-bottom: 20px; }
-.recipe p { margin: 12px 0 0; font-size: 13.5px; line-height: 1.65; color: var(--quiet); }
+.recipe > li:last-of-type { border-bottom: none; padding-bottom: 0; margin-bottom: 14px; }
+.recipe p { margin: 10px 0 0; font-size: 13px; line-height: 1.65; color: var(--quiet); }
 
 pre {
-  margin: 10px 0 0;
-  padding: 14px 16px;
+  margin: 9px 0 0;
+  padding: 12px 14px;
   border-radius: 8px;
   background: var(--red-deep);
   color: var(--sand);
