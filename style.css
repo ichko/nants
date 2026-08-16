@@ -78,6 +78,18 @@ h2 {
   padding: 4px 2px 10px;
   color: var(--sand);
 }
+.bar .by {
+  margin-left: auto;
+  align-self: baseline;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--sand);
+  opacity: 0.7;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(252, 222, 185, 0.35);
+}
+.bar .by:hover { opacity: 1; color: #fff; border-bottom-color: #fff; }
 .bar h1 { color: #fff; }
 .bar p { margin: 0; font-size: 12px; color: var(--sand); opacity: 0.9; }
 .bar .lede { max-width: 46em; font-size: 13.5px; line-height: 1.5; }
