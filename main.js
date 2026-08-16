@@ -39,6 +39,7 @@ const playing = { on: true };
 const HOLD = 0;      // no waiting about: the ramp is gentle enough on its own
 const WINDUP = 7000; // then wind up to CRUISE over this long
 const CRUISE = 500;  // steps a second, until the slider is touched
+const FLOOR = 14;    // the rate it opens at, so it never looks stalled
 const REDRAW = 120;  // never draw more often than this, however fast the screen
 
 let owed = 0;  // steps we still owe at the chosen rate
@@ -56,11 +57,10 @@ function rate(now) {
   const gone = now - began;
   if (gone < HOLD) return 0;
 
-  // a long slow crawl to begin with: cubic, so the first seconds stay readable
+  // opens at a walking pace and winds up from there, cubic, so the first
+  // seconds stay readable without ever looking stalled
   const along = Math.min((gone - HOLD) / WINDUP, 1);
-  const smooth = along * along * along;
-
-  const eased = Math.round(CRUISE * smooth);
+  const eased = Math.round(FLOOR + (CRUISE - FLOOR) * along * along * along);
   speed.value = eased;
   return eased;
 }
