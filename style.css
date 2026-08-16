@@ -477,8 +477,8 @@ pre.cite {
   padding: 0;
   background: none;
   color: var(--muted);
-  font-size: 11.5px;
-  line-height: 1.6;
+  font-size: 10.5px;
+  line-height: 1.55;
   box-shadow: none;
 }
 
