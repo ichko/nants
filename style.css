@@ -25,10 +25,14 @@ body {
   padding: 14px;
   max-width: 700px;
 
-  /* one soft wash of red, brighter at the top, no pattern */
-  background:
-    radial-gradient(120% 90% at 50% 0%, #c01806 0%, var(--red) 45%, #8f0a02 100%)
-    fixed;
+  /* wandering dashed trails, the way ants leave them, over a wash of red */
+  background-color: var(--red);
+  background-image:
+    url("trails.svg"),
+    url("noise.svg"),
+    radial-gradient(120% 90% at 50% 0%, #c01806 0%, var(--red) 45%, #8f0a02 100%);
+  background-size: 240px 240px, 140px 140px, auto;
+  background-attachment: fixed;
   color: var(--ink);
   font: 14px/1.5 var(--text);
 }

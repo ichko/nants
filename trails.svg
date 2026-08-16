@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <!-- wandering dashed trails that tile seamlessly: every path leaves an edge
+       at the same height and slope it enters the opposite one -->
+  <g fill="none" stroke-width="1.7" stroke-linecap="round" stroke-dasharray="7 10">
+    <g stroke="rgba(252,222,185,.30)">
+      <path d="M0,40 C20,21 40,21 60,40 C80,59 100,59 120,40
+               C140,21 160,21 180,40 C200,59 220,59 240,40"/>
+      <path d="M0,152 C20,169 40,169 60,152 C80,135 100,135 120,152
+               C140,169 160,169 180,152 C200,135 220,135 240,152"/>
+    </g>
+    <g stroke="rgba(0,0,0,.20)">
+      <path d="M0,96 C20,113 40,113 60,96 C80,79 100,79 120,96
+               C140,113 160,113 180,96 C200,79 220,79 240,96"/>
+      <path d="M0,206 C20,188 40,188 60,206 C80,224 100,224 120,206
+               C140,188 160,188 180,206 C200,224 220,224 240,206"/>
+    </g>
+    <g stroke="rgba(252,222,185,.20)">
+      <path d="M62,0 C44,20 44,40 62,60 C80,80 80,100 62,120
+               C44,140 44,160 62,180 C80,200 80,220 62,240"/>
+      <path d="M186,0 C204,20 204,40 186,60 C168,80 168,100 186,120
+               C204,140 204,160 186,180 C168,200 168,220 186,240"/>
+    </g>
+  </g>
+</svg>
