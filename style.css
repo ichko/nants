@@ -307,6 +307,28 @@ button.is-on:hover { background: var(--deep); box-shadow: 2px 2px 0 var(--ink); 
 .toggle button:first-child { border-radius: 5px 0 0 5px; }
 .toggle button:last-child { border-radius: 0 5px 5px 0; border-right-width: 1px; }
 
+/* the creature stamps: emoji big enough to read, six across */
+.stamps {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+}
+.stamps button {
+  padding: 5px 0;
+  font-size: 17px;
+  line-height: 1.1;
+  box-shadow: none;
+  background: var(--white);
+  border-color: var(--line);
+}
+.stamps button:hover { background: var(--sand); color: var(--deep); }
+.stamps button.is-on {
+  background: var(--red);
+  border-color: var(--deep);
+  box-shadow: 2px 2px 0 var(--deep);
+}
+.stamps button:active { transform: translate(1px, 1px); }
+
 .keys { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 15px; }
 .tip {
   margin-top: 15px;

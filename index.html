@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Fraunces:opsz,wght@9..144,400;9..144,500&family=JetBrains+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="style.css?v=21">
+<link rel="stylesheet" href="style.css?v=22">
 </head>
 <body>
 
@@ -79,7 +79,19 @@
           <span>pointer</span>
           <div class="toggle" id="tool" role="group">
             <button type="button" data-tool="erase" class="is-on">🧽 erase</button>
-            <button type="button" data-tool="seed">🐜 ants</button>
+            <button type="button" data-tool="seed">🐜 stamp</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <span>what to stamp</span>
+          <div class="stamps" id="stamp" role="group">
+            <button type="button" data-kind="gecko" title="gecko">🦎</button>
+            <button type="button" data-kind="ant" title="ant">🐜</button>
+            <button type="button" data-kind="butterfly" title="butterfly">🦋</button>
+            <button type="button" data-kind="turtle" title="turtle">🐢</button>
+            <button type="button" data-kind="octopus" title="octopus">🐙</button>
+            <button type="button" data-kind="snail" title="snail">🐌</button>
           </div>
         </div>
 
@@ -93,6 +105,11 @@
           <input id="brush" type="range" min="1" max="12" value="5" step="1">
         </label>
 
+        <label class="row">
+          <span>zoom out <b id="zoomRead">48x48</b></span>
+          <input id="zoom" type="range" min="48" max="96" value="48" step="8">
+        </label>
+
         <div class="keys">
           <button id="play" class="is-on">⏸ pause</button>
           <button id="once">↷ nudge</button>
@@ -101,8 +118,9 @@
         </div>
 
         <p class="tip">
-          Erase part of the drawing and the colony repairs it. Add ants
-          somewhere else and they start a second one.
+          Erase part of the drawing and the colony repairs it. Pick a creature
+          and stamp another one anywhere; they all share the one field, and each
+          colony is drawn in its own colour.
         </p>
       </div>
     </div>
@@ -231,8 +249,8 @@ uv run nants-crowd out/&lt;datetime&gt;</code></pre>
   </div>
 </footer>
 
-<script src="weights.js"></script>
-<script type="module" src="main.js?v=21"></script>
+<script src="weights.js?v=22"></script>
+<script type="module" src="main.js?v=22"></script>
 <script>
   const ticks = document.getElementById("ticks");
   for (let c = 3; c < 16; c++) {

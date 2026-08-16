@@ -2,10 +2,11 @@
 // Each ant is memoryless: it reads its 3x3 patch, its own odometer and a clock,
 // then writes to the cell below and turns left, straight on, or right.
 
-const SIZE = 48; // field is SIZE x SIZE, wrapping at the edges
+const BASE = 48; // the field the ants were trained on, wrapping at the edges
+const MAX = 96;  // zoomed out: four times as many cells in the same box
 const CELL = 16; // channels per cell: 3 visible, 13 the ants' own scratch
 const HORIZON = 6000; // steps the clock is scaled to
-const SPAN = 24; // what the odometer divides by, as trained
+const SPAN = 24; // what the odometer divides by, as trained: never rescaled
 const LIMIT = 8; // nothing past this reaches the brain
 
 const RING = [[0, -1], [1, 0], [0, 1], [-1, 0]]; // up, right, down, left
@@ -26,17 +27,29 @@ function unpack(entry) {
   return new Float32Array(bytes.buffer);
 }
 
-export class Colony {
-  constructor(weights) {
-    this.w1 = unpack(weights.w1);
-    this.write = unpack(weights.write);
-    this.move = unpack(weights.move);
-    this.b1 = unpack(weights.b1);
-    this.bWrite = unpack(weights.b_write);
-    this.bMove = unpack(weights.b_move);
-    this.width = weights.b1.shape[1];
+function brainOf(weights) {
+  return {
+    w1: unpack(weights.w1),
+    write: unpack(weights.write),
+    move: unpack(weights.move),
+    b1: unpack(weights.b1),
+    bWrite: unpack(weights.b_write),
+    bMove: unpack(weights.b_move),
+    width: weights.b1.shape[1],
+  };
+}
 
-    this.field = new Float32Array(SIZE * SIZE * CELL);
+export class Colony {
+  // brains: { name: weights }. Every ant carries the name of the one it uses,
+  // so several creatures can be drawn on the one field at the same time.
+  constructor(brains, size = BASE) {
+    this.brains = {};
+    for (const name of Object.keys(brains)) this.brains[name] = brainOf(brains[name]);
+    this.kinds = Object.keys(this.brains);
+    this.width = Math.max(...this.kinds.map((k) => this.brains[k].width));
+
+    this.size = size;
+    this.field = new Float32Array(size * size * CELL);
     this.sense = new Float32Array(SENSE);
     this.hidden = new Float32Array(this.width);
     this.ants = [];
@@ -44,6 +57,7 @@ export class Colony {
   }
 
   clear() {
+    const SIZE = this.size;
     for (let i = 0; i < SIZE * SIZE; i++) {
       for (let c = 0; c < CELL; c++) {
         this.field[i * CELL + c] = c < 3 ? WHITE[c] : 0;
@@ -53,10 +67,47 @@ export class Colony {
     this.t = 0;
   }
 
-  seed(x, y, count, spin) {
+  // Zooming keeps the drawing where it is and grows the field around it, so
+  // the middle stays the middle and every square shrinks by the same amount.
+  resize(size) {
+    if (size === this.size) return;
+    const was = this.size;
+    const next = new Float32Array(size * size * CELL);
+    for (let i = 0; i < size * size; i++) {
+      for (let c = 0; c < CELL; c++) next[i * CELL + c] = c < 3 ? WHITE[c] : 0;
+    }
+
+    const shift = Math.round((size - was) / 2); // where the old corner lands
+    for (let y = 0; y < was; y++) {
+      const ny = y + shift;
+      if (ny < 0 || ny >= size) continue;
+      for (let x = 0; x < was; x++) {
+        const nx = x + shift;
+        if (nx < 0 || nx >= size) continue;
+        const from = (y * was + x) * CELL;
+        const to = (ny * size + nx) * CELL;
+        for (let c = 0; c < CELL; c++) next[to + c] = this.field[from + c];
+      }
+    }
+
+    this.ants = this.ants.filter((ant) => {
+      ant.x += shift;
+      ant.y += shift;
+      ant.ox += shift;
+      ant.oy += shift;
+      return ant.x >= 0 && ant.x < size && ant.y >= 0 && ant.y < size;
+    });
+
+    this.size = size;
+    this.field = next;
+  }
+
+  seed(x, y, count, spin, kind = this.kinds[0]) {
+    const SIZE = this.size;
     for (let i = 0; i < count; i++) {
       const heading = spin ? (Math.random() * 4) | 0 : 0;
       this.ants.push({
+        kind,
         x: ((x % SIZE) + SIZE) % SIZE,
         y: ((y % SIZE) + SIZE) % SIZE,
         ox: ((x % SIZE) + SIZE) % SIZE,
@@ -69,6 +120,7 @@ export class Colony {
   }
 
   erase(cx, cy, radius) {
+    const SIZE = this.size;
     for (let dy = -radius; dy <= radius; dy++) {
       for (let dx = -radius; dx <= radius; dx++) {
         if (dx * dx + dy * dy > radius * radius) continue;
@@ -82,6 +134,7 @@ export class Colony {
 
   // everything the ant knows, in the order the brain was trained to expect
   look(ant) {
+    const SIZE = this.size;
     const s = this.sense;
     const flip = ant.flip;
     const c = QCOS[ant.heading];
@@ -142,23 +195,25 @@ export class Colony {
   }
 
   think(ant) {
+    const SIZE = this.size;
+    const brain = this.brains[ant.kind] || this.brains[this.kinds[0]];
     const s = this.look(ant);
     const h = this.hidden;
-    const width = this.width;
+    const width = brain.width;
 
-    for (let j = 0; j < width; j++) h[j] = this.b1[j];
+    for (let j = 0; j < width; j++) h[j] = brain.b1[j];
     for (let i = 0; i < SENSE; i++) {
       const v = s[i];
       if (v === 0) continue;
       const row = i * width;
-      for (let j = 0; j < width; j++) h[j] += v * this.w1[row + j];
+      for (let j = 0; j < width; j++) h[j] += v * brain.w1[row + j];
     }
     for (let j = 0; j < width; j++) if (h[j] < 0) h[j] = 0;
 
     const at = (ant.y * SIZE + ant.x) * CELL;
     for (let c = 0; c < CELL; c++) {
-      let d = this.bWrite[c];
-      for (let j = 0; j < width; j++) d += h[j] * this.write[j * CELL + c];
+      let d = brain.bWrite[c];
+      for (let j = 0; j < width; j++) d += h[j] * brain.write[j * CELL + c];
       let v = this.field[at + c] + d;
       this.field[at + c] = v > LIMIT ? LIMIT : v < -LIMIT ? -LIMIT : v;
     }
@@ -166,8 +221,8 @@ export class Colony {
     let best = -Infinity;
     const logits = [0, 0, 0];
     for (let m = 0; m < 3; m++) {
-      let z = this.bMove[m];
-      for (let j = 0; j < width; j++) z += h[j] * this.move[j * 3 + m];
+      let z = brain.bMove[m];
+      for (let j = 0; j < width; j++) z += h[j] * brain.move[j * 3 + m];
       logits[m] = z;
       if (z > best) best = z;
     }
@@ -187,6 +242,7 @@ export class Colony {
   }
 
   step() {
+    const SIZE = this.size;
     for (const ant of this.ants) {
       const move = this.think(ant);
       ant.heading = (((ant.heading + TURNS[move] * ant.flip) % 4) + 4) % 4;
@@ -198,4 +254,4 @@ export class Colony {
   }
 }
 
-export { SIZE, CELL, HORIZON, RING };
+export { BASE, MAX, CELL, HORIZON, RING };

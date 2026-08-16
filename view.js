@@ -1,7 +1,7 @@
 // WebGL2 drawing: the field on one canvas, its sixteen channels on another.
 // The sixteen channels live in one float texture laid out as four rgba tiles.
 
-import { SIZE, CELL, RING } from "./sim.js";
+import { BASE, CELL, RING } from "./sim.js";
 
 const QUAD = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
 const TILES = CELL / 4;
@@ -110,12 +110,36 @@ export class View {
     for (const filter of [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER]) {
       gl.texParameteri(gl.TEXTURE_2D, filter, gl.NEAREST);
     }
-    gl.texStorage2D(gl.TEXTURE_2D, 1, gl.RGBA32F, SIZE * TILES, SIZE);
-    this.packed = new Float32Array(SIZE * SIZE * CELL);
+    this.size = 0;
+    this.setSize(BASE);
+  }
+
+  // the field can grow when the view zooms out, and a webgl texture cannot be
+  // resized in place, so make a new one whenever the count of cells changes
+  setSize(size) {
+    if (size === this.size) return;
+    const gl = this.gl;
+    if (this.size) {
+      gl.deleteTexture(this.texture);
+      this.texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, this.texture);
+      for (const edge of [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T]) {
+        gl.texParameteri(gl.TEXTURE_2D, edge, gl.CLAMP_TO_EDGE);
+      }
+      for (const filter of [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER]) {
+        gl.texParameteri(gl.TEXTURE_2D, filter, gl.NEAREST);
+      }
+    }
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.texStorage2D(gl.TEXTURE_2D, 1, gl.RGBA32F, size * TILES, size);
+    this.packed = new Float32Array(size * size * CELL);
+    this.size = size;
   }
 
   // rearrange the field into four side by side rgba tiles
-  upload(field) {
+  upload(field, size = this.size) {
+    this.setSize(size);
+    const SIZE = this.size;
     const packed = this.packed;
     for (let y = 0; y < SIZE; y++) {
       for (let x = 0; x < SIZE; x++) {
@@ -156,6 +180,7 @@ export class View {
   ants(list, tint, cells, alpha) {
     if (!list.length) return;
     const gl = this.gl;
+    const SIZE = this.size;
     const reach = (cells / SIZE) * 2; // clip space size of one cell, times cells
     const verts = new Float32Array(list.length * 6);
 

@@ -1,6 +1,6 @@
 // Wiring: the colony, the two views, and the controls around them.
 
-import { Colony, SIZE, CELL } from "./sim.js";
+import { Colony, BASE, MAX, CELL } from "./sim.js";
 import { View } from "./view.js";
 
 // if anything below throws, say so on the page: a phone has no console
@@ -13,9 +13,18 @@ window.addEventListener("error", (event) => {
 });
 
 const RAMP = [[0.13, 0.11, 0.09], [0.99, 0.87, 0.73]]; // ink to the alife sand
-const MAPLE = [0.69, 0.01, 0.0]; // #b00300
 
-const colony = new Colony(WEIGHTS);
+// one colour per creature, so a mixed field still reads at a glance
+const COLOURS = {
+  gecko: [0.69, 0.01, 0.0],
+  ant: [0.10, 0.09, 0.08],
+  butterfly: [0.60, 0.13, 0.66],
+  turtle: [0.05, 0.45, 0.24],
+  octopus: [0.90, 0.42, 0.05],
+  snail: [0.08, 0.34, 0.72],
+};
+
+const colony = new Colony(BRAINS);
 const stage = new View(document.getElementById("stage"), { ramp: RAMP });
 const strip = new View(document.getElementById("strip"), { ramp: RAMP });
 
@@ -23,15 +32,46 @@ const dom = (id) => document.getElementById(id);
 const speed = dom("speed");
 const crowd = dom("crowd");
 const brush = dom("brush");
+const zoom = dom("zoom");
 const tool = { value: "erase" };
+const kind = { value: colony.kinds[0] };
+
 const toolBar = dom("tool");
+const stampBar = dom("stamp");
+
+function showTool() {
+  for (const button of toolBar.querySelectorAll("button")) {
+    button.classList.toggle("is-on", button.dataset.tool === tool.value);
+  }
+  for (const button of stampBar.querySelectorAll("button")) {
+    const picked = tool.value === "seed" && button.dataset.kind === kind.value;
+    button.classList.toggle("is-on", picked);
+  }
+}
+
 toolBar.addEventListener("click", (event) => {
   const pressed = event.target.closest("button[data-tool]");
   if (!pressed) return;
   tool.value = pressed.dataset.tool;
-  for (const button of toolBar.querySelectorAll("button")) {
-    button.classList.toggle("is-on", button === pressed);
-  }
+  showTool();
+});
+
+// picking a creature is also how you pick up the stamp
+stampBar.addEventListener("click", (event) => {
+  const pressed = event.target.closest("button[data-kind]");
+  if (!pressed) return;
+  kind.value = pressed.dataset.kind;
+  tool.value = "seed";
+  showTool();
+});
+
+// zooming out gives the ants more room; the drawing stays where it is
+zoom.min = BASE;
+zoom.max = MAX;
+zoom.addEventListener("input", () => {
+  const cells = Number(zoom.value);
+  colony.resize(cells);
+  dom("zoomRead").textContent = `${cells}x${cells}`;
 });
 const playing = { on: true };
 
@@ -65,23 +105,29 @@ function rate(now) {
 }
 
 function seedAt(x, y) {
-  colony.seed(x, y, Number(crowd.value), false); // all facing the same way
+  // all facing the same way, and all of whichever creature is picked
+  colony.seed(x, y, Number(crowd.value), false, kind.value);
 }
 
 function reset(withColony) {
   colony.clear();
-  if (withColony) seedAt(SIZE >> 1, SIZE >> 1);
+  if (withColony) seedAt(colony.size >> 1, colony.size >> 1);
 }
 
 // ---- drawing -------------------------------------------------------------
 
 function paint() {
   stage.fit();
-  stage.upload(colony.field);
+  stage.upload(colony.field, colony.size);
   stage.panel([-1, -1, 2, 2], -1);
   // the faster it runs, the more the ants get out of the way of the picture
   const rush = Math.min(Number(speed.value) / Number(speed.max), 1);
-  stage.ants(colony.ants, MAPLE, 1.1, 1 - 0.9 * rush);
+  const fade = 1 - 0.9 * rush;
+  const reach = 1.1 * (BASE / colony.size); // triangles shrink with the squares
+  for (const name of colony.kinds) {
+    const mine = colony.ants.filter((ant) => ant.kind === name);
+    if (mine.length) stage.ants(mine, COLOURS[name] || COLOURS.gecko, reach, fade);
+  }
 
   // the scratch channels: one row, square, with the same gap on every side
   const shown = CELL - 3;
@@ -91,7 +137,7 @@ function paint() {
 
   strip.canvas.style.height = `${Math.round(panel + gap * 2)}px`;
   strip.fit();
-  strip.upload(colony.field);
+  strip.upload(colony.field, colony.size);
 
   // the same pixel gap is a different amount of clip space across and down
   const tall = strip.canvas.clientHeight || panel + gap * 2;
@@ -140,8 +186,8 @@ let dragging = false;
 function cellAt(clientX, clientY) {
   const box = stage.canvas.getBoundingClientRect();
   return {
-    x: Math.floor(((clientX - box.left) / box.width) * SIZE),
-    y: Math.floor(((clientY - box.top) / box.height) * SIZE),
+    x: Math.floor(((clientX - box.left) / box.width) * colony.size),
+    y: Math.floor(((clientY - box.top) / box.height) * colony.size),
   };
 }
 
@@ -153,7 +199,7 @@ function showGhost(clientX, clientY) {
   }
   const box = stage.canvas.getBoundingClientRect();
   const nest = wrap.getBoundingClientRect();
-  const across = (Number(brush.value) * 2 + 1) * (box.width / SIZE);
+  const across = (Number(brush.value) * 2 + 1) * (box.width / colony.size);
 
   wrap.classList.add("show-ghost");
   ghost.style.width = `${across}px`;
@@ -245,5 +291,6 @@ window.addEventListener("keydown", (event) => {
   dom(id).click();
 });
 
+showTool();
 reset(true);
 requestAnimationFrame(tick);
