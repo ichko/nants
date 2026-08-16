@@ -189,10 +189,6 @@ body { overscroll-behavior: contain; }
 .controls .row { display: block; margin: 0 0 9px; font-size: 11.5px; color: var(--faded); }
 .controls .row > span { display: block; margin-bottom: 4px; }
 .controls .row b { color: var(--ink); font-family: ui-monospace, Menlo, monospace; }
-.row.tick { display: flex; align-items: flex-start; gap: 7px; }
-.row.tick span { margin: 0; }
-.row.tick input { accent-color: var(--red); margin-top: 2px; }
-
 input[type="range"] {
   width: 100%;
   height: 16px;

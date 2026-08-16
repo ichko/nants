@@ -23,7 +23,6 @@ const dom = (id) => document.getElementById(id);
 const speed = dom("speed");
 const crowd = dom("crowd");
 const brush = dom("brush");
-const spin = dom("spin");
 const tool = { value: "erase" };
 const toolBar = dom("tool");
 toolBar.addEventListener("click", (event) => {
@@ -66,7 +65,7 @@ function rate(now) {
 }
 
 function seedAt(x, y) {
-  colony.seed(x, y, Number(crowd.value), spin.checked);
+  colony.seed(x, y, Number(crowd.value), false); // all facing the same way
 }
 
 function reset(withColony) {
