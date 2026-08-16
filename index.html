@@ -91,112 +91,69 @@
   <ol class="ticks" id="ticks"></ol>
 </section>
 
-<section class="panel loop-panel">
-  <div class="panel-top">
+<section class="band">
+  <div class="band-top">
     <h2>How it works</h2>
-    <p class="legend">one ant, one step, six thousand times</p>
+    <p class="legend">one ant, one step, six thousand times over</p>
   </div>
 
-  <svg class="loop" viewBox="0 0 700 208" role="img"
-       aria-label="An ant reads its 3 by 3 patch, a small network decides, it paints the cell below and turns, and the whole thing repeats.">
-    <defs>
-      <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
-              markerWidth="7" markerHeight="7" orient="auto">
-        <path d="M0,1 L9,5 L0,9" fill="none" stroke="#fcdeb9" stroke-width="1.8"
-              stroke-linecap="round" stroke-linejoin="round"/>
-      </marker>
-      <marker id="thin" viewBox="0 0 10 10" refX="8" refY="5"
-              markerWidth="6" markerHeight="6" orient="auto">
-        <path d="M0,1 L9,5 L0,9" fill="none" stroke="rgba(252,222,185,.75)"
-              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-      </marker>
-    </defs>
-
-    <!-- 1. the patch it reads -->
-    <g transform="translate(34,22)">
-      <rect width="90" height="90" rx="4" fill="rgba(252,222,185,.10)"/>
-      <g stroke="rgba(252,222,185,.30)" stroke-width="1">
-        <path d="M30 0V90 M60 0V90 M0 30H90 M0 60H90"/>
-      </g>
-      <rect x="30" y="30" width="30" height="30" fill="rgba(252,222,185,.18)"/>
-      <path d="M45 36 L54 56 L36 56 Z" fill="#fcdeb9"/>
-    </g>
-    <text class="step" x="79" y="136" text-anchor="middle">01 · reads</text>
-    <text class="tiny" x="79" y="154" text-anchor="middle">gradients across the patch,</text>
-    <text class="tiny" x="79" y="168" text-anchor="middle">turned into its own frame</text>
-
-    <path d="M140 67 H196" stroke="#fcdeb9" stroke-width="2" marker-end="url(#arrow)"/>
-
-    <!-- 2. the network -->
-    <g transform="translate(212,32)">
-      <rect width="176" height="70" rx="10" fill="none"
-            stroke="rgba(252,222,185,.55)" stroke-width="1.5"/>
-      <text class="mono" x="88" y="41" text-anchor="middle">93 → 128 → 19</text>
-    </g>
-    <text class="step" x="300" y="136" text-anchor="middle">02 · thinks</text>
-    <text class="tiny" x="300" y="154" text-anchor="middle">with how far it has walked</text>
-    <text class="tiny" x="300" y="168" text-anchor="middle">from where it woke up</text>
-
-    <path d="M404 67 H460" stroke="#fcdeb9" stroke-width="2" marker-end="url(#arrow)"/>
-
-    <!-- 3. what it does -->
-    <g transform="translate(478,22)">
-      <rect x="44" y="60" width="30" height="30" rx="3" fill="rgba(252,222,185,.35)"/>
-      <path d="M59 44 L68 62 L50 62 Z" fill="#fcdeb9"/>
-      <g stroke="rgba(252,222,185,.75)" stroke-width="1.6" fill="none">
-        <path d="M52 38 L30 20" marker-end="url(#thin)"/>
-        <path d="M59 36 V14" marker-end="url(#thin)"/>
-        <path d="M66 38 L88 20" marker-end="url(#thin)"/>
-      </g>
-    </g>
-    <text class="step" x="537" y="136" text-anchor="middle">03 · paints, turns</text>
-    <text class="tiny" x="537" y="154" text-anchor="middle">a delta into the cell below,</text>
-    <text class="tiny" x="537" y="168" text-anchor="middle">then left, on, or right</text>
-
-    <!-- a brace under the lot: all of this, over and over -->
-    <g fill="none" stroke="rgba(252,222,185,.38)" stroke-width="1.5">
-      <path d="M79 182 V192 H286"/>
-      <path d="M414 192 H613 V182"/>
-    </g>
-    <text class="mono small" x="350" y="196" text-anchor="middle">↻ 6000 times</text>
-  </svg>
+  <ol class="steps">
+    <li>
+      <span class="k">01</span>
+      <h3>Reads</h3>
+      <p>Gradients across the 3×3 patch under it, turned into the frame it
+        faces. It sees nothing further, ever.</p>
+    </li>
+    <li>
+      <span class="k">02</span>
+      <h3>Thinks</h3>
+      <p>Those, and how far it has walked from where it woke up, through one
+        network of 14,483 numbers.</p>
+    </li>
+    <li>
+      <span class="k">03</span>
+      <h3>Writes and turns</h3>
+      <p>A delta into the cell below, then a turn sampled from three: left,
+        straight on, or right. Then it steps.</p>
+    </li>
+  </ol>
 
   <dl class="facts">
     <div>
-      <dt>What it carries</dt>
-      <dd>A position and a heading. Nothing else survives a step.</dd>
+      <dt>Carries</dt>
+      <dd>A position and a heading, and nothing else.</dd>
     </div>
     <div>
-      <dt>What it sees</dt>
-      <dd>Its own 3×3 patch, rotated into the frame it faces.</dd>
+      <dt>Frame</dt>
+      <dd>Egocentric. Rotate the ant and the drawing turns with it.</dd>
     </div>
     <div>
-      <dt>What a cell holds</dt>
-      <dd>Sixteen numbers. Three are the picture, thirteen are scratch.</dd>
+      <dt>A cell</dt>
+      <dd>Sixteen numbers: three the picture, thirteen scratch.</dd>
     </div>
     <div>
-      <dt>How it turns</dt>
-      <dd>Sampled from three, so no two runs come out alike.</dd>
+      <dt>Crowd</dt>
+      <dd>One brain runs them all, whether one ant or nine.</dd>
     </div>
     <div>
-      <dt>How many brains</dt>
-      <dd>One. The same 14,483 numbers run every ant in the colony.</dd>
+      <dt>Learned</dt>
+      <dd>Backprop for painting, trial and error for walking.</dd>
     </div>
     <div>
-      <dt>How it learned</dt>
-      <dd>Backprop for the painting, trial and error for the walking.</dd>
+      <dt>Repair</dt>
+      <dd>Never trained. Damage was never shown to it, yet cut a piece away
+        and the colony puts it back.</dd>
     </div>
   </dl>
 </section>
 
-<section class="panel prose">
-  <div class="panel-top">
+<section class="band">
+  <div class="band-top">
     <h2>Train your own</h2>
     <p class="legend">a couple of hours on a gpu</p>
   </div>
 
   <div class="split">
-    <div>
 <pre><code><span class="said"># clone and install</span>
 git clone https://github.com/ichko/nants
 cd nants &amp;&amp; uv sync
@@ -206,16 +163,15 @@ uv run python starter/my_nants.py
 
 <span class="said"># one to nine ants a colony, damaged halfway</span>
 uv run nants-crowd out/&lt;datetime&gt;</code></pre>
-    </div>
-    <div>
+    <div class="beside">
       <p>
-        It writes a folder under <code>out/</code> you can watch while it works:
-        the picture as it stands, the error curve, and the best brain so far.
+        It writes a folder under <code>out/</code> you can watch while it
+        works: the picture as it stands, the error curve, and the best brain
+        so far.
       </p>
       <p>
-        Stop it whenever you like — the good one is already on disk, and
-        pointing the trainer back at the same folder carries on where it left
-        off.
+        Stop it whenever you like. The good one is already on disk, and
+        pointing the trainer back at the same folder carries on from there.
       </p>
       <p class="callout">
         <a href="https://github.com/ichko/nants">The code, and the longer story, on GitHub →</a>
