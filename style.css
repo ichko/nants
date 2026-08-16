@@ -291,42 +291,119 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 }
 .ticks .rgb { color: var(--red); font-weight: 700; }
 
-/* ---- the written bits ---- */
+/* ---- the written sections ---- */
 
 .prose { margin-top: 10px; }
-.prose h2 { margin-bottom: 8px; }
-.prose p { margin: 0 0 9px; font-size: 13px; max-width: 62em; }
-.prose a { color: var(--red); }
-.prose a:hover { color: var(--red-deep); }
-
-.diagram {
-  display: block;
-  width: 100%;
-  height: auto;
-  margin: 4px 0 12px;
+.prose h3 {
+  margin: 0 0 4px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
 }
-.diagram .head { font: 600 12px "Iowan Old Style", Georgia, serif; fill: var(--ink); }
-.diagram .cap { font: 600 11px "Iowan Old Style", Georgia, serif; fill: var(--red); }
-.diagram .sub { font: 10.5px ui-monospace, Menlo, monospace; fill: var(--faded); }
-.diagram .big { font-size: 26px; }
+.prose p { margin: 0 0 10px; font-size: 13px; line-height: 1.55; max-width: 62em; }
+.prose a { color: var(--red); text-decoration: none; border-bottom: 1px solid var(--sand); }
+.prose a:hover { color: var(--red-deep); border-bottom-color: var(--red); }
 
-.points { margin: 0; padding-left: 18px; font-size: 13px; max-width: 62em; }
-.points li { margin-bottom: 5px; }
+/* the numbered badge both lists share */
+.num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--red);
+  color: #fff;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* how it works: four boxes, arrows in the gaps */
+.flow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  margin: 2px 0 12px;
+  padding: 0;
+  list-style: none;
+}
+.flow li {
+  position: relative;
+  padding: 11px 12px 12px;
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--sand);
+  border-radius: 6px;
+  background: #fffdf9;
+}
+.flow li .num { margin-bottom: 7px; }
+.flow li p { margin: 0; font-size: 12px; color: var(--faded); }
+.flow li:not(:last-child)::after {
+  content: "→";
+  position: absolute;
+  right: -18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--red);
+  font-size: 15px;
+}
+@media (max-width: 700px) {
+  .flow { grid-template-columns: 1fr; gap: 26px; }
+  .flow li:not(:last-child)::after {
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: -21px;
+    transform: translateX(-50%);
+    content: "↓";
+  }
+}
+
+.aside {
+  margin: 0 0 14px;
+  padding: 9px 11px;
+  border-left: 3px solid var(--red);
+  border-radius: 0 5px 5px 0;
+  background: var(--wash);
+  font-size: 12.5px;
+}
+
+.points { margin: 0; padding-left: 17px; font-size: 13px; max-width: 62em; }
+.points li { margin-bottom: 6px; line-height: 1.5; }
 .points b { color: var(--red-deep); }
 
+/* train your own: a number, then the step */
+.recipe { margin: 2px 0 0; padding: 0; list-style: none; }
+.recipe > li {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 11px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+}
+.recipe > li:last-of-type { border-bottom: none; margin-bottom: 6px; }
+.recipe .num { margin-top: 1px; }
+.recipe p { margin: 8px 0 0; font-size: 12.5px; color: var(--faded); }
+
 pre {
-  margin: 0 0 10px;
+  margin: 0;
   padding: 10px 12px;
   border-radius: 6px;
-  background: #2b2320;
-  color: #f3ece2;
+  background: #26201d;
+  color: #f4ece1;
   overflow-x: auto;
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 pre code { font-family: ui-monospace, Menlo, monospace; }
-pre .said { color: #a99b8b; }
 code { font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
-p code { padding: 1px 4px; border-radius: 3px; background: var(--wash); }
+p code {
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--wash);
+  color: var(--red-deep);
+}
 
-.foot a { text-decoration: none; border-bottom: 1px solid rgba(255, 255, 255, 0.4); }
+.callout { margin: 0; font-size: 13px; }
+.foot a { text-decoration: none; border-bottom: 1px solid rgba(255, 255, 255, 0.45); }

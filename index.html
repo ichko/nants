@@ -31,7 +31,6 @@
       <div id="ghost"></div>
     </div>
     <p id="trouble"></p>
-    <p class="hint" id="hintLine">Drag to cut pieces away 🧽 · switch to ants to start a new colony</p>
   </section>
 
   <section class="panel controls">
@@ -90,104 +89,96 @@
 </section>
 
 <section class="panel prose">
-  <h2>How it works</h2>
+  <div class="panel-top">
+    <h2>How it works</h2>
+    <p class="legend">one ant, one step</p>
+  </div>
 
-  <svg class="diagram" viewBox="0 0 720 214" role="img"
-       aria-label="An ant reads its neighbourhood, a small network decides, the ant paints and turns.">
-    <defs>
-      <marker id="tip" viewBox="0 0 10 10" refX="9" refY="5"
-              markerWidth="6" markerHeight="6" orient="auto">
-        <path d="M0,0 L10,5 L0,10 z" fill="#b00300"/>
-      </marker>
-    </defs>
+  <ol class="flow">
+    <li>
+      <span class="num">1</span>
+      <h3>It looks</h3>
+      <p>At the 3×3 patch under its feet. Nothing further, ever.</p>
+    </li>
+    <li>
+      <span class="num">2</span>
+      <h3>It decides</h3>
+      <p>One small network. 93 numbers in, 128 hidden, 19 out.</p>
+    </li>
+    <li>
+      <span class="num">3</span>
+      <h3>It paints and turns</h3>
+      <p>Adds to the cell below, then turns left, straight on, or right.</p>
+    </li>
+    <li>
+      <span class="num">4</span>
+      <h3>It steps forward</h3>
+      <p>Six thousand times over. A gecko comes out.</p>
+    </li>
+  </ol>
 
-    <!-- what it sees -->
-    <g transform="translate(8,28)">
-      <rect x="0" y="0" width="108" height="108" rx="6" fill="#fcdeb9"/>
-      <g stroke="#e8dccb" stroke-width="1">
-        <path d="M36 0 V108 M72 0 V108 M0 36 H108 M0 72 H108"/>
-      </g>
-      <path d="M54 44 L64 62 L44 62 z" fill="#b00300"/>
-      <text class="cap" x="54" y="130" text-anchor="middle">its 3×3 patch</text>
-      <text class="sub" x="54" y="146" text-anchor="middle">and nothing else</text>
-    </g>
-
-    <path d="M124 78 H186" stroke="#b00300" stroke-width="2" marker-end="url(#tip)"/>
-
-    <!-- the brain -->
-    <g transform="translate(196,44)">
-      <rect x="0" y="0" width="150" height="76" rx="8" fill="#fff"
-            stroke="#b00300" stroke-width="2"/>
-      <text class="head" x="75" y="30" text-anchor="middle">one small network</text>
-      <text class="sub" x="75" y="50" text-anchor="middle">93 in → 128 → 19 out</text>
-      <text class="sub" x="75" y="65" text-anchor="middle">14,483 numbers in all</text>
-    </g>
-
-    <!-- the extra senses feeding in -->
-    <g transform="translate(196,150)">
-      <text class="cap" x="0" y="0">it also knows:</text>
-      <text class="sub" x="0" y="16">how far it has walked from where it woke up</text>
-      <text class="sub" x="0" y="30">how far through the run it is</text>
-    </g>
-    <path d="M271 148 V126" stroke="#b00300" stroke-width="2" marker-end="url(#tip)"/>
-
-    <path d="M354 78 H414" stroke="#b00300" stroke-width="2" marker-end="url(#tip)"/>
-
-    <!-- what it does -->
-    <g transform="translate(424,28)">
-      <rect x="0" y="0" width="150" height="44" rx="8" fill="#fcdeb9"/>
-      <text class="head" x="75" y="20" text-anchor="middle">paint this cell</text>
-      <text class="sub" x="75" y="35" text-anchor="middle">16 numbers, added on</text>
-
-      <rect x="0" y="60" width="150" height="44" rx="8" fill="#fcdeb9"/>
-      <text class="head" x="75" y="80" text-anchor="middle">turn</text>
-      <text class="sub" x="75" y="95" text-anchor="middle">left · straight on · right</text>
-
-      <text class="cap" x="75" y="130" text-anchor="middle">then step forward</text>
-      <text class="sub" x="75" y="146" text-anchor="middle">and do it all again</text>
-    </g>
-
-    <path d="M582 78 H646" stroke="#b00300" stroke-width="2" marker-end="url(#tip)"/>
-    <g transform="translate(654,50)">
-      <text class="big" x="18" y="26" text-anchor="middle">🦎</text>
-      <text class="sub" x="18" y="52" text-anchor="middle">6000 steps</text>
-    </g>
-  </svg>
+  <p class="aside">
+    It knows two more things: how far it has walked from where it woke up, and
+    how far through the run it is. That is the whole of its world.
+  </p>
 
   <ul class="points">
-    <li><b>No memory.</b> An ant carries nothing from one step to the next. Every
-      decision is made from scratch.</li>
-    <li><b>No map.</b> It only knows how far it has walked from its own starting
-      cell, the way an ant counts its steps home.</li>
+    <li><b>No memory.</b> Nothing carries from one step to the next. Every
+      decision is made afresh.</li>
+    <li><b>No map.</b> Only the distance walked from its own starting cell, the
+      way an ant counts its steps home.</li>
     <li><b>No talking.</b> Ants never signal each other. They share a field, and
       that is all.</li>
     <li><b>One brain, any crowd.</b> The same 14,483 numbers run every ant. One
-      ant paints the gecko slowly; nine paint it quickly.</li>
-    <li><b>Trained, not designed.</b> What to paint is learned by ordinary
-      backprop. Where to walk is learned by trial and error, since a turn cannot
-      be differentiated.</li>
+      ant draws the gecko slowly, nine draw it quickly.</li>
+    <li><b>Learned, not written.</b> What to paint comes from backprop. Where to
+      walk comes from trial and error, because a turn cannot be differentiated.</li>
   </ul>
 </section>
 
 <section class="panel prose">
-  <h2>Train your own</h2>
-  <p>
-    Pick a different emoji and grow that instead. A run takes a couple of hours
-    on a gpu, and you can watch it improve while it goes.
-  </p>
+  <div class="panel-top">
+    <h2>Train your own</h2>
+    <p class="legend">a couple of hours on a gpu</p>
+  </div>
 
+  <ol class="recipe">
+    <li>
+      <span class="num">1</span>
+      <div>
+        <h3>Get it</h3>
 <pre><code>git clone https://github.com/ichko/nants
 cd nants
-uv sync
+uv sync</code></pre>
+      </div>
+    </li>
+    <li>
+      <span class="num">2</span>
+      <div>
+        <h3>Grow something</h3>
+<pre><code>uv run python starter/my_nants.py</code></pre>
+        <p>
+          Change the emoji at the top of <code>starter/my_nants.py</code> to
+          grow something else. It writes a folder under <code>out/</code> you
+          can watch while it works. Stop it whenever you like — the best brain
+          is already saved.
+        </p>
+      </div>
+    </li>
+    <li>
+      <span class="num">3</span>
+      <div>
+        <h3>See what it made</h3>
+<pre><code>uv run nants-crowd out/&lt;datetime&gt;</code></pre>
+        <p>
+          One to nine ants a square, with a piece bitten out halfway to see it
+          grow back. There are seven more of these.
+        </p>
+      </div>
+    </li>
+  </ol>
 
-uv run nants-train                     <span class="said"># writes out/&lt;datetime&gt;/</span>
-uv run nants-crowd out/&lt;datetime&gt;      <span class="said"># renders the gif</span></code></pre>
-
-  <p>
-    To grow something else, copy <code>starter/my_nants.py</code>, change the
-    emoji at the top, and run it. Everything else is already wired up.
-  </p>
-  <p class="hint">
+  <p class="callout">
     <a href="https://github.com/ichko/nants">The code, and the longer story, on GitHub →</a>
   </p>
 </section>
