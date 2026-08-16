@@ -87,7 +87,8 @@ header.red { border-top: none; }
 }
 @keyframes march { to { stroke-dashoffset: -84; } }
 @media (prefers-reduced-motion: reduce) { .trails path { animation: none; } }
-.paper + .paper .inner { padding-top: 32px; }
+/* dashed rules where two bands of the same colour meet */
+.paper + .paper .inner { padding-top: 32px; border-top: 1px dashed var(--line); }
 .edge .inner { padding-bottom: 48px; }
 
 /* ---- masthead ----------------------------------------------------------- */
@@ -164,6 +165,8 @@ h1 {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 10px;
+  padding-bottom: 7px;
+  border-bottom: 1px dashed var(--line);
 }
 h2 {
   font-size: 11px;
@@ -471,7 +474,7 @@ p code { padding: 1px 5px; border-radius: 3px; background: var(--sand); color: v
   border-top: 1px dashed var(--line);  /* the only line it needs */
 }
 .cream .inner { padding-top: 16px; padding-bottom: 18px; }
-.cream .head { margin-bottom: 8px; }
+.cream .head { margin-bottom: 8px; padding-bottom: 0; border-bottom: none; }
 
 pre.cite {
   width: 100%;
@@ -479,8 +482,9 @@ pre.cite {
   padding: 0;
   background: none;
   color: var(--muted);
-  font-size: 10.5px;
-  line-height: 1.55;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.35;
   box-shadow: none;
 }
 
