@@ -12,6 +12,10 @@
   --faded: #7b6f66;
   --rule: #e8dccb;
   --round: 8px;
+
+  --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --text: "Inter", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, sans-serif;
+  --mono: "JetBrains Mono", var(--mono);
 }
 
 * { box-sizing: border-box; }
@@ -21,36 +25,44 @@ body {
   padding: 14px;
   max-width: 700px;
 
-  /* a faint grid of dots with a whisper of noise over it */
+  /* criss crossing dashed trails, like the paths the ants leave, over a
+     grid of dots and a whisper of grain */
   background-color: var(--red);
   background-image:
     url("noise.svg"),
-    radial-gradient(circle at 1px 1px, rgba(252, 222, 185, 0.16) 1px, transparent 0),
-    radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.10) 1px, transparent 0);
-  background-size: 140px 140px, 12px 12px, 12px 12px;
-  background-position: 0 0, 0 0, 6px 6px;
+    repeating-linear-gradient(45deg,
+      rgba(252, 222, 185, 0.20) 0 9px, transparent 9px 26px),
+    repeating-linear-gradient(-45deg,
+      rgba(0, 0, 0, 0.13) 0 9px, transparent 9px 26px),
+    radial-gradient(circle at 1px 1px, rgba(252, 222, 185, 0.22) 1.2px, transparent 0);
+  background-size: 140px 140px, auto, auto, 26px 26px;
   background-attachment: fixed;
   color: var(--ink);
-  font: 14px/1.45 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font: 14px/1.5 var(--text);
 }
 
 h1, h2 { margin: 0; font-weight: 600; }
 h1 {
   display: flex;
   align-items: baseline;
-  gap: 9px;
-  font-size: 27px;
-  letter-spacing: 0.01em;
+  gap: 10px;
+  font-family: var(--display);
+  font-size: 31px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
 }
 h1 .loud { color: #fff; }
 h1 .quiet {
-  font-size: 15px;
+  font-family: var(--mono);
+  font-size: 14px;
   font-weight: 700;
   color: var(--sand);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.02em;
 }
 h2 {
+  font-family: var(--text);
   font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.13em;
   color: var(--faded);
@@ -87,7 +99,7 @@ h2 {
 @media (max-width: 640px) { .board { grid-template-columns: 1fr; } }
 
 .panel {
-  padding: 10px;
+  padding: 14px 15px;
   background: var(--card);
   border-radius: var(--round);
   box-shadow: 4px 4px 0 var(--red-deep);   /* hard edged, no blur, no spread */
@@ -148,7 +160,7 @@ body { overscroll-behavior: contain; }
   border-radius: 5px;
   background: var(--red);
   color: #fff;
-  font-family: ui-monospace, Menlo, monospace;
+  font-family: var(--mono);
   font-size: 11px;
   word-break: break-word;
 }
@@ -175,7 +187,7 @@ body { overscroll-behavior: contain; }
   align-items: baseline;
   gap: 14px;
   margin: 0;
-  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-family: var(--mono);
 }
 .readout div { display: flex; align-items: baseline; gap: 5px; }
 .readout dt {
@@ -190,7 +202,7 @@ body { overscroll-behavior: contain; }
 
 .controls .row { display: block; margin: 0 0 9px; font-size: 11.5px; color: var(--faded); }
 .controls .row > span { display: block; margin-bottom: 4px; }
-.controls .row b { color: var(--ink); font-family: ui-monospace, Menlo, monospace; }
+.controls .row b { color: var(--ink); font-family: var(--mono); }
 input[type="range"] {
   width: 100%;
   height: 16px;
@@ -282,7 +294,7 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
   margin: 4px 0 0;
   padding: 0;
   list-style: none;
-  font-family: ui-monospace, Menlo, monospace;
+  font-family: var(--mono);
   font-size: 9.5px;
   color: var(--faded);
   text-align: center;
@@ -295,9 +307,7 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 
 .prose {
   margin-top: 12px;
-  padding: 16px 18px 20px;
-  font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
-    sans-serif;
+  padding: 22px 24px 26px;
   color: #3c352f;
   --tint: #fdf2de;
   --edge: #f1ddbd;
@@ -305,11 +315,11 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 }
 .prose .panel-top { margin-bottom: 16px; padding-bottom: 10px; }
 .prose h2 { font-size: 12px; letter-spacing: 0.14em; color: var(--red-deep); }
-.prose .legend { font-family: inherit; font-size: 12px; color: var(--quiet); }
+.prose .legend { font-family: var(--text); font-size: 12px; color: var(--quiet); }
 
 .prose h3 {
-  margin: 0 0 6px;
-  font-family: inherit;
+  margin: 0 0 7px;
+  font-family: var(--text);
   font-size: 14px;
   font-weight: 650;
   letter-spacing: -0.005em;
@@ -327,7 +337,7 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 .num {
   display: block;
   margin-bottom: 8px;
-  font-family: ui-monospace, Menlo, monospace;
+  font-family: var(--mono);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.18em;
@@ -346,7 +356,7 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 }
 .flow li {
   position: relative;
-  padding: 16px;
+  padding: 18px 18px 20px;
   border-radius: 10px;
   background: var(--tint);
 }
@@ -373,8 +383,8 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 }
 
 .aside {
-  margin: 0 0 20px;
-  padding: 14px 16px;
+  margin: 0 0 24px;
+  padding: 16px 18px;
   border-radius: 10px;
   background: var(--wash);
   border-left: 3px solid var(--sand);
@@ -417,7 +427,7 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 
 pre {
   margin: 0;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-radius: 8px;
   background: var(--red-deep);
   color: var(--sand);
@@ -425,8 +435,8 @@ pre {
   font-size: 12.5px;
   line-height: 1.75;
 }
-pre code { font-family: ui-monospace, Menlo, monospace; }
-code { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }
+pre code { font-family: var(--mono); }
+code { font-family: var(--mono); font-size: 12.5px; }
 p code {
   padding: 2px 5px;
   border-radius: 4px;
