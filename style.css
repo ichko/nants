@@ -468,10 +468,22 @@ p code { padding: 1px 5px; border-radius: 3px; background: var(--sand); color: v
 
 /* ---- the citation ------------------------------------------------------ */
 
+.cite-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.cite-row h2 { padding-top: 13px; white-space: nowrap; }
+
 pre.cite {
-  max-width: 40em;
-  font-size: 13px;
-  line-height: 1.8;
+  flex: 1;
+  min-width: 280px;
+  max-width: 42em;
+  padding: 12px 16px;
+  font-size: 12px;
+  line-height: 1.55;
+  box-shadow: 2px 2px 0 var(--sand-deep);
 }
 
 /* ---- footer ------------------------------------------------------------- */
