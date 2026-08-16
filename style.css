@@ -58,6 +58,7 @@ a { color: inherit; }
   overflow: hidden;
   background-color: var(--red);
   background-image: url("grain.svg");  /* sits behind the trails */
+  background-blend-mode: overlay;   /* keeps the red true, only the light moves */
   color: #fff;
   border-top: 8px solid var(--sand);
   border-bottom: 8px solid var(--sand);
