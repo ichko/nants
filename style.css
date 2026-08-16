@@ -52,38 +52,25 @@ a { color: inherit; }
   margin: 0 auto;
   padding: 38px 24px;
 }
+/* a thick sand rule wherever red meets paper */
 .red {
   position: relative;
   overflow: hidden;
   background-color: var(--red);
   color: #fff;
+  border-top: 8px solid var(--sand);
+  border-bottom: 8px solid var(--sand);
 }
+header.red { border-top: none; }
 .red .inner { position: relative; z-index: 1; }
-.deep { background-color: var(--deep); color: rgba(255, 255, 255, 0.78); }
+.deep {
+  background-color: var(--deep);
+  color: rgba(255, 255, 255, 0.78);
+  border-top: 8px solid var(--sand);
+}
 .paper {
   background-color: var(--paper);
   background-image: url("dots.svg?v=9");
-}
-
-/* ---- the seams between bands, a different one each time ----------------- */
-
-.seam { width: 100%; }
-/* masthead into paper: bumps */
-.seam.scallop { height: 15px; background: url("seam-scallop.svg") repeat-x; }
-/* paper into red: pennants */
-.seam.teeth { height: 13px; background: url("seam-teeth.svg") repeat-x; }
-/* red into paper: a thick rule and a hairline under it */
-.seam.rules {
-  height: 12px;
-  background: linear-gradient(
-    var(--sand) 0 6px, var(--paper) 6px 9px,
-    var(--sand) 9px 11px, var(--paper) 11px 12px);
-}
-/* paper into the footer: stitching */
-.seam.stitch {
-  height: 8px;
-  background: repeating-linear-gradient(90deg,
-    var(--sand) 0 22px, var(--paper) 22px 34px);
 }
 
 /* ---- the trails on the red, walked by the dashes ------------------------ */
