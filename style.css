@@ -440,15 +440,18 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 .recipe p { margin: 12px 0 0; font-size: 13.5px; line-height: 1.65; color: var(--quiet); }
 
 pre {
-  margin: 0;
+  margin: 10px 0 0;
   padding: 14px 16px;
   border-radius: 8px;
   background: var(--red-deep);
   color: var(--sand);
-  overflow-x: auto;
   font-size: 12.5px;
-  line-height: 1.75;
+  line-height: 1.8;
+  /* wrap rather than scroll: a long clone url should not need dragging */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
+.recipe pre + p { margin-top: 12px; }
 pre code { font-family: var(--mono); }
 code { font-family: var(--mono); font-size: 12.5px; }
 p code {
