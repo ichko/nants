@@ -138,13 +138,14 @@ h1 {
 }
 .credit .names { font-family: var(--mono); font-size: 13.5px; color: var(--sand); }
 .credit span.dot { padding: 0 2px; opacity: 0.5; }
+/* both are underlined all the time; hovering only moves the colour */
 .credit a {
-  padding: 3px 6px;
-  border-radius: 4px;
   text-decoration: none;
-  transition: background 120ms linear, color 120ms linear;
+  border-bottom: 1px solid currentColor;
+  transition: color 180ms ease;
 }
-.credit a:hover { background: var(--sand); color: var(--deep); }
+.credit a:hover { color: #fff; }
+.credit .era { font-size: 11.5px; color: rgba(252, 222, 185, 0.62); }
 
 .lede {
   max-width: 34em;
