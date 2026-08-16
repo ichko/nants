@@ -310,7 +310,61 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 }
 .ticks .rgb { color: var(--red); font-weight: 700; }
 
-/* ---- the written sections ---- */
+/* ---- how it works, on the red ---- */
+
+.loop-panel {
+  margin-top: 10px;
+  padding: 16px 18px 18px;
+  background: linear-gradient(158deg, #a80300 0%, #8c0a02 100%);
+  color: var(--sand);
+}
+.loop-panel h2 { color: var(--sand); font-size: 11.5px; letter-spacing: 0.14em; }
+.loop-panel .panel-top {
+  margin-bottom: 12px;
+  padding-bottom: 9px;
+  border-bottom-color: rgba(252, 222, 185, 0.26);
+}
+.loop-panel .legend {
+  font-family: var(--text);
+  font-size: 12px;
+  color: rgba(252, 222, 185, 0.6);
+}
+
+.loop { display: block; width: 100%; height: auto; margin: 2px 0 4px; }
+.loop .step {
+  font: 600 12px var(--text);
+  fill: #fff;
+  letter-spacing: 0.01em;
+}
+.loop .tiny { font: 11px var(--text); fill: rgba(252, 222, 185, 0.7); }
+.loop .mono { font: 700 13px var(--mono); fill: var(--sand); }
+.loop .small { font-size: 10.5px; font-weight: 400; fill: rgba(252, 222, 185, 0.6); }
+
+/* the facts, in a plain grid: term above, line under */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px 24px;
+  margin: 12px 0 0;
+}
+@media (max-width: 700px) { .facts { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 460px) { .facts { grid-template-columns: 1fr; } }
+.facts dt {
+  margin-bottom: 3px;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(252, 222, 185, 0.55);
+}
+.facts dd {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* ---- train your own ---- */
 
 .prose {
   margin-top: 10px;
@@ -320,133 +374,32 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
   --edge: #f1ddbd;
   --quiet: #6b6058;
 }
-.prose .panel-top { margin-bottom: 14px; padding-bottom: 9px; }
+.prose .panel-top { margin-bottom: 13px; padding-bottom: 9px; }
 .prose h2 { font-size: 11.5px; letter-spacing: 0.14em; color: var(--red-deep); }
 .prose .legend { font-family: var(--text); font-size: 12px; color: var(--quiet); }
-.prose h3 {
-  margin: 0 0 5px;
-  font-family: var(--text);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--ink);
-}
-.prose p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.6; max-width: 60em; }
+.prose p { margin: 0 0 10px; font-size: 13px; line-height: 1.65; color: var(--quiet); }
 .prose a { color: var(--red); text-decoration: none; border-bottom: 1px solid var(--edge); }
 .prose a:hover { color: var(--red-deep); border-bottom-color: var(--red); }
 
-/* the red panel, so the page is not an unbroken run of white cards */
-.inverted {
-  background: linear-gradient(158deg, #a80300 0%, #8c0a02 100%);
-  color: var(--sand);
-}
-.inverted h2 { color: var(--sand); }
-.inverted .panel-top { border-bottom-color: rgba(252, 222, 185, 0.28); }
-.inverted .legend { color: rgba(252, 222, 185, 0.65); }
-.inverted h3 { color: #fff; }
+.split { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; }
+@media (max-width: 700px) { .split { grid-template-columns: 1fr; } }
+.split p:last-child { margin-bottom: 0; }
 
-/* the trail: four stops on a dashed line, the way an ant leaves one */
-.trail {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  margin: 2px 0 18px;
-  padding: 0;
-  list-style: none;
-}
-.trail::before {
-  content: "";
-  position: absolute;
-  left: 13px;
-  right: 13px;
-  top: 13px;
-  border-top: 2px dashed rgba(252, 222, 185, 0.38);
-}
-.trail li { position: relative; padding-top: 38px; }
-.trail p {
-  margin: 0;
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: rgba(252, 222, 185, 0.75);
-}
-.dot {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 27px;
-  height: 27px;
-  border-radius: 50%;
-  background: var(--sand);
-  color: var(--red-deep);
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 700;
-}
-@media (max-width: 700px) {
-  .trail { grid-template-columns: 1fr 1fr; gap: 18px 20px; }
-  .trail::before { display: none; }
-}
-@media (max-width: 430px) { .trail { grid-template-columns: 1fr; } }
-
-/* the aside sits in a well, rather than floating on the red */
-.inverted .aside {
-  margin: 0 0 16px;
-  padding: 12px 14px;
-  border: none;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.17);
-  font-size: 13px;
-  line-height: 1.6;
-  color: rgba(252, 222, 185, 0.92);
-}
-
-.points {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px 22px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-@media (max-width: 620px) { .points { grid-template-columns: 1fr; } }
-.points li {
-  position: relative;
-  padding-left: 15px;
-  font-size: 13px;
-  line-height: 1.55;
-  color: rgba(252, 222, 185, 0.78);
-}
-.points li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 7px;
-  width: 5px;
-  height: 5px;
-  border-radius: 1px;
-  background: var(--sand);
-}
-.points b { color: #fff; font-weight: 500; }
-
-/* one terminal block for the whole recipe */
 pre {
-  margin: 0 0 12px;
+  margin: 0;
   padding: 14px 16px;
   border-radius: 8px;
   background: #2a221f;
   color: #f5ece1;
   overflow-x: auto;
-  font-size: 12.5px;
-  line-height: 1.75;
+  font-size: 12px;
+  line-height: 1.8;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 pre code { font-family: var(--mono); }
-pre .said { color: #9c8f80; }
-code { font-family: var(--mono); font-size: 12.5px; }
+pre .said { color: #97897a; }
+code { font-family: var(--mono); font-size: 12px; }
 p code {
   padding: 1px 5px;
   border-radius: 4px;
@@ -454,5 +407,5 @@ p code {
   color: var(--red-deep);
 }
 
-.callout { margin: 0; font-size: 13.5px; }
+.callout { margin: 0; font-size: 13px; }
 .foot a { text-decoration: none; border-bottom: 1px solid rgba(255, 255, 255, 0.45); }
