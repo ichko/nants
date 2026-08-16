@@ -1,7 +1,7 @@
 // WebGL2 drawing: the field on one canvas, its sixteen channels on another.
 // The sixteen channels live in one float texture laid out as four rgba tiles.
 
-import { BASE, CELL, RING } from "./sim.js?v=36";
+import { BASE, CELL, RING } from "./sim.js?v=37";
 
 const QUAD = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
 const TILES = CELL / 4;

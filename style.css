@@ -470,7 +470,8 @@ p code { padding: 1px 5px; border-radius: 3px; background: var(--sand); color: v
 
 /* the whole band is the container: cream, edge to edge, nothing boxed in it */
 .cream {
-  background: var(--cream);
+  background-color: var(--cream);
+  background-image: url("trace.svg?v=37");  /* the ant trails, still and faint */
   border-top: 1px dashed var(--line);  /* the only line it needs */
 }
 .cream .inner { padding-top: 16px; padding-bottom: 18px; }
