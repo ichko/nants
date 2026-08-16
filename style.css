@@ -82,14 +82,14 @@ h2 {
   margin-left: auto;
   align-self: baseline;
   font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: 0.04em;
+  font-size: 9px;
+  letter-spacing: 0.05em;
   color: var(--sand);
-  opacity: 0.7;
+  opacity: 0.45;
   text-decoration: none;
-  border-bottom: 1px solid rgba(252, 222, 185, 0.35);
+  border-bottom: none;
 }
-.bar .by:hover { opacity: 1; color: #fff; border-bottom-color: #fff; }
+.bar .by:hover { opacity: 0.9; }
 .bar h1 { color: #fff; }
 .bar p { margin: 0; font-size: 12px; color: var(--sand); opacity: 0.9; }
 .bar .lede { max-width: 46em; font-size: 13.5px; line-height: 1.5; }
