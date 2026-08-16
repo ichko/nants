@@ -466,6 +466,14 @@ pre .c { color: #9a8c7c; }
 code { font-family: var(--mono); font-size: 13px; }
 p code { padding: 1px 5px; border-radius: 3px; background: var(--sand); color: var(--ink); }
 
+/* ---- the citation ------------------------------------------------------ */
+
+pre.cite {
+  max-width: 40em;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
 /* ---- footer ------------------------------------------------------------- */
 
 .deep .inner { padding-top: 22px; padding-bottom: 24px; text-align: center; }
