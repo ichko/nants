@@ -100,23 +100,23 @@
   <ol class="trail">
     <li>
       <span class="dot">1</span>
-      <h3>It looks</h3>
-      <p>At its 3×3 patch. Nothing further, ever.</p>
+      <h3>Reads</h3>
+      <p>Gradients across its 3×3 patch, turned into its own frame.</p>
     </li>
     <li>
       <span class="dot">2</span>
-      <h3>It decides</h3>
-      <p>One small network. 93 numbers in, 19 out.</p>
+      <h3>Thinks</h3>
+      <p>Those, plus how far it has walked, through one small network.</p>
     </li>
     <li>
       <span class="dot">3</span>
-      <h3>It paints</h3>
-      <p>Adds to the cell below, then turns.</p>
+      <h3>Writes</h3>
+      <p>A delta, added to the sixteen numbers in the cell below.</p>
     </li>
     <li>
       <span class="dot">4</span>
-      <h3>It walks on</h3>
-      <p>Six thousand times. A gecko appears.</p>
+      <h3>Turns</h3>
+      <p>Samples left, right or straight on, then steps forward.</p>
     </li>
   </ol>
 
@@ -126,10 +126,16 @@
   </p>
 
   <ul class="points">
-    <li><b>No memory.</b> Nothing carries from one step to the next.</li>
-    <li><b>No map.</b> Only the distance walked from its own starting cell.</li>
-    <li><b>No talking.</b> Ants share a field, and nothing else.</li>
-    <li><b>One brain, any crowd.</b> The same 14,483 numbers run every ant.</li>
+    <li><b>Position and orientation.</b> The whole of what an ant carries
+      between steps.</li>
+    <li><b>Everything is egocentric.</b> Gradients and offset are both rotated
+      into the frame the ant faces.</li>
+    <li><b>Sixteen numbers a cell.</b> Three are the picture; the other thirteen
+      are the colony's scratch space.</li>
+    <li><b>The turn is a sample.</b> Three choices, drawn from what the network
+      believes, so no two runs are identical.</li>
+    <li><b>One brain, any crowd.</b> The same 14,483 numbers run every ant,
+      whether there is one or nine.</li>
     <li><b>Learned, not written.</b> Backprop for the painting, trial and error
       for the walking.</li>
   </ul>
@@ -141,14 +147,14 @@
     <p class="legend">a couple of hours on a gpu</p>
   </div>
 
-<pre><code><span class="said"># get it</span>
+<pre><code><span class="said"># clone and install</span>
 git clone https://github.com/ichko/nants
 cd nants &amp;&amp; uv sync
 
-<span class="said"># change the emoji at the top of the file, then grow it</span>
+<span class="said"># pick an emoji at the top of the file, then leave it running</span>
 uv run python starter/my_nants.py
 
-<span class="said"># see what it made</span>
+<span class="said"># nine colonies, one to nine ants, a bite taken out halfway</span>
 uv run nants-crowd out/&lt;datetime&gt;</code></pre>
 
   <p>

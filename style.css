@@ -82,7 +82,7 @@ h2 {
   border-bottom: none;
 }
 .bar .by a { color: inherit; text-decoration: none; }
-.bar .by:hover { opacity: 0.9; }
+.bar .by a:hover { color: #fff; }
 .bar h1 { color: #fff; }
 .bar p { margin: 0; font-size: 12px; color: var(--sand); opacity: 0.9; }
 .bar .lede { max-width: 46em; font-size: 13.5px; line-height: 1.5; }
@@ -310,156 +310,149 @@ button.is-on:hover { background: var(--red-deep); box-shadow: 2px 2px 0 var(--in
 }
 .ticks .rgb { color: var(--red); font-weight: 700; }
 
-/* ---- the written sections ----------------------------------------------
-   set in a sans, unlike the rest of the page: the serif turns muddy at these
-   sizes. spacing runs on a strict 4 / 8 / 12 / 16 / 24 scale.            */
+/* ---- the written sections ---- */
 
 .prose {
   margin-top: 10px;
-  padding: 14px 15px 16px;
+  padding: 16px 18px 18px;
   color: #3c352f;
   --tint: #fdf2de;
   --edge: #f1ddbd;
   --quiet: #6b6058;
 }
-.prose .panel-top { margin-bottom: 12px; padding-bottom: 8px; }
-.prose h2 { font-size: 12px; letter-spacing: 0.14em; color: var(--red-deep); }
+.prose .panel-top { margin-bottom: 14px; padding-bottom: 9px; }
+.prose h2 { font-size: 11.5px; letter-spacing: 0.14em; color: var(--red-deep); }
 .prose .legend { font-family: var(--text); font-size: 12px; color: var(--quiet); }
-
 .prose h3 {
   margin: 0 0 5px;
   font-family: var(--text);
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--ink);
 }
-.prose p {
-  margin: 0 0 10px;
-  font-size: 13.5px;
-  line-height: 1.6;
-  max-width: 58em;
-}
+.prose p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.6; max-width: 60em; }
 .prose a { color: var(--red); text-decoration: none; border-bottom: 1px solid var(--edge); }
 .prose a:hover { color: var(--red-deep); border-bottom-color: var(--red); }
 
-.num {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 21px;
-  height: 21px;
-  margin-bottom: 8px;
-  border-radius: 50%;
-  background: var(--red);
-  color: #fff;
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 700;
+/* the red panel, so the page is not an unbroken run of white cards */
+.inverted {
+  background: linear-gradient(158deg, #a80300 0%, #8c0a02 100%);
+  color: var(--sand);
 }
+.inverted h2 { color: var(--sand); }
+.inverted .panel-top { border-bottom-color: rgba(252, 222, 185, 0.28); }
+.inverted .legend { color: rgba(252, 222, 185, 0.65); }
+.inverted h3 { color: #fff; }
 
-/* how it works */
-.flow {
+/* the trail: four stops on a dashed line, the way an ant leaves one */
+.trail {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 22px;
-  margin: 0 0 16px;
+  gap: 20px;
+  margin: 2px 0 18px;
   padding: 0;
   list-style: none;
 }
-.flow li {
-  position: relative;
-  padding: 12px 13px 14px;
-  border: 1px solid var(--edge);
-  border-top: 3px solid var(--sand);
-  border-radius: 7px;
-  background: #fffdf9;
-}
-.flow li p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--quiet); }
-.flow li:not(:last-child)::after {
-  content: "›";
+.trail::before {
+  content: "";
   position: absolute;
-  right: -16px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--red);
-  font-size: 22px;
-  line-height: 1;
+  left: 13px;
+  right: 13px;
+  top: 13px;
+  border-top: 2px dashed rgba(252, 222, 185, 0.38);
+}
+.trail li { position: relative; padding-top: 38px; }
+.trail p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: rgba(252, 222, 185, 0.75);
+}
+.dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: var(--sand);
+  color: var(--red-deep);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
 }
 @media (max-width: 700px) {
-  .flow { grid-template-columns: 1fr; gap: 28px; }
-  .flow li:not(:last-child)::after {
-    right: auto;
-    left: 50%;
-    top: auto;
-    bottom: -24px;
-    transform: translateX(-50%) rotate(90deg);
-  }
+  .trail { grid-template-columns: 1fr 1fr; gap: 18px 20px; }
+  .trail::before { display: none; }
 }
+@media (max-width: 430px) { .trail { grid-template-columns: 1fr; } }
 
-.aside {
+/* the aside sits in a well, rather than floating on the red */
+.inverted .aside {
   margin: 0 0 16px;
-  padding: 11px 13px;
-  border-radius: 10px;
-  background: var(--wash);
-  border-left: 3px solid var(--sand);
-  font-size: 13.5px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.17);
+  font-size: 13px;
   line-height: 1.6;
-  color: var(--quiet);
+  color: rgba(252, 222, 185, 0.92);
 }
 
-.points { margin: 0; padding: 0; list-style: none; max-width: 58em; }
+.points {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (max-width: 620px) { .points { grid-template-columns: 1fr; } }
 .points li {
   position: relative;
-  margin-bottom: 7px;
-  padding-left: 17px;
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--quiet);
+  padding-left: 15px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(252, 222, 185, 0.78);
 }
-.points li:last-child { margin-bottom: 0; }
 .points li::before {
   content: "";
   position: absolute;
   left: 0;
-  top: 9px;
-  width: 6px;
-  height: 6px;
-  border-radius: 2px;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
   background: var(--sand);
 }
-.points b { color: #26211d; font-weight: 650; }
+.points b { color: #fff; font-weight: 500; }
 
-/* train your own */
-.recipe { margin: 0; padding: 0; list-style: none; }
-.recipe > li {
-  padding-bottom: 16px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid var(--edge);
-}
-.recipe > li:last-of-type { border-bottom: none; padding-bottom: 0; margin-bottom: 14px; }
-.recipe p { margin: 10px 0 0; font-size: 13px; line-height: 1.65; color: var(--quiet); }
-
+/* one terminal block for the whole recipe */
 pre {
-  margin: 9px 0 0;
-  padding: 12px 14px;
+  margin: 0 0 12px;
+  padding: 14px 16px;
   border-radius: 8px;
-  background: var(--red-deep);
-  color: var(--sand);
+  background: #2a221f;
+  color: #f5ece1;
+  overflow-x: auto;
   font-size: 12.5px;
-  line-height: 1.8;
-  /* wrap rather than scroll: a long clone url should not need dragging */
+  line-height: 1.75;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-.recipe pre + p { margin-top: 12px; }
 pre code { font-family: var(--mono); }
+pre .said { color: #9c8f80; }
 code { font-family: var(--mono); font-size: 12.5px; }
 p code {
-  padding: 2px 5px;
+  padding: 1px 5px;
   border-radius: 4px;
   background: var(--tint);
   color: var(--red-deep);
 }
 
-.callout { margin: 0; font-size: 14px; }
+.callout { margin: 0; font-size: 13.5px; }
 .foot a { text-decoration: none; border-bottom: 1px solid rgba(255, 255, 255, 0.45); }
