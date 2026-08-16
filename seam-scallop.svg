@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="15">
+  <!-- sand bumps hanging off the masthead into the paper below -->
+  <rect width="28" height="15" fill="#fbf7f0"/>
+  <rect width="28" height="8" fill="#fcdeb9"/>
+  <circle cx="7" cy="8" r="7" fill="#fcdeb9"/>
+  <circle cx="21" cy="8" r="7" fill="#fcdeb9"/>
+</svg>
