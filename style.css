@@ -57,8 +57,8 @@ a { color: inherit; }
   position: relative;
   overflow: hidden;
   background-color: var(--red);
-  background-image: url("grain.svg?v=15");  /* sits behind the trails */
-  background-blend-mode: overlay;   /* keeps the red true, only the light moves */
+  background-image: url("grain.svg?v=16");  /* sits behind the trails */
+  background-blend-mode: soft-light;   /* keeps the red true, only the light moves */
   color: #fff;
   border-top: 8px solid var(--sand);
   border-bottom: 8px solid var(--sand);
