@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Fraunces:opsz,wght@9..144,400;9..144,500&family=JetBrains+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="style.css?v=11">
+<link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
 
@@ -186,8 +186,9 @@
       </div>
       <div>
         <dt>Two kinds of learning</dt>
-        <dd>Backprop teaches it what to write. The turns are discrete, so those
-          are learned by trial and error instead.</dd>
+        <dd>Backprop teaches it what to write. A turn is a discrete choice, so
+          no gradient passes through it; those are learned with REINFORCE, the
+          policy gradient method from reinforcement learning.</dd>
       </div>
     </dl>
   </div>
@@ -231,7 +232,7 @@ uv run nants-crowd out/&lt;datetime&gt;</code></pre>
 </footer>
 
 <script src="weights.js"></script>
-<script type="module" src="main.js?v=11"></script>
+<script type="module" src="main.js?v=12"></script>
 <script>
   const ticks = document.getElementById("ticks");
   for (let c = 3; c < 16; c++) {
