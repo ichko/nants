@@ -3,189 +3,220 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Neural Ants (NAnts) 🦎</title>
+<title>Neural Ants (NAnts) 🐜</title>
+<meta name="description" content="A colony of tiny neural networks that walk a grid and draw a picture, with no memory and no map.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,400;9..144,500&family=JetBrains+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="style.css?v=202608160616">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
-<header class="bar">
-  <h1><span class="loud">Neural Ants</span><span class="quiet">(NAnts)</span></h1>
-  <p class="by">
-    <a href="https://www.izhv.eu/">Iliya Zhechev</a> ·
-    <a href="https://emergingresearchers.life/">ERA</a>
-  </p>
-  <p class="lede">
-    NAnts are to Langton's ant what NCAs (neural cellular automata) are to
-    CAs (cellular automata): the hand written rule, learned instead.
-  </p>
+<!-- ─────────────────────────────── red ─────────────────────────────── -->
+<header class="band red">
+  <div class="inner masthead">
+    <div>
+      <h1>Neural&nbsp;Ants</h1>
+      <p class="tag">NAnts</p>
+    </div>
+    <p class="credit">
+      <a href="https://www.izhv.eu/">Iliya Zhechev</a>
+      <span>·</span>
+      <a href="https://emergingresearchers.life/">ERA</a>
+    </p>
+  </div>
 </header>
 
-<main class="board">
+<!-- ────────────────────────────── paper ────────────────────────────── -->
+<section class="band paper">
+  <div class="inner">
+    <p class="lede">
+      NAnts are to Langton's ant what NCAs are to cellular automata: the rule is
+      learned rather than written by hand.
+    </p>
 
-  <section class="panel stage-panel">
-    <div class="panel-top">
-      <h2>The field</h2>
-      <dl class="readout">
-        <div><dt>step</dt><dd id="stepCount">0</dd></div>
-        <div><dt>ants</dt><dd id="antCount">0</dd></div>
-      </dl>
-    </div>
-    <div class="field-wrap" id="fieldWrap">
-      <canvas id="stage" width="480" height="480"></canvas>
-      <div id="ghost"></div>
-    </div>
-    <p id="trouble"></p>
-  </section>
+    <div class="workbench">
+      <div class="field">
+        <div class="head">
+          <h2>The field</h2>
+          <p class="meter">
+            <span>step <b id="stepCount">0</b></span>
+            <span>ants <b id="antCount">0</b></span>
+          </p>
+        </div>
+        <div class="field-wrap" id="fieldWrap">
+          <canvas id="stage" width="480" height="480"></canvas>
+          <div id="ghost"></div>
+        </div>
+        <p id="trouble"></p>
+      </div>
 
-  <section class="panel controls">
-    <h2>Controls</h2>
+      <div class="panel">
+        <h2>Controls</h2>
 
-    <label class="row">
-      <span>speed <b id="speedRead">0/s</b></span>
-      <input id="speed" type="range" min="0" max="1200" value="0" step="1">
-    </label>
+        <label class="row">
+          <span>speed <b id="speedRead">0/s</b></span>
+          <input id="speed" type="range" min="0" max="1200" value="0" step="1">
+        </label>
 
-    <div class="row">
-      <span>pointer does</span>
-      <div class="toggle" id="tool" role="group">
-        <button type="button" data-tool="erase" class="is-on">🧽 erase</button>
-        <button type="button" data-tool="seed">🐜 ants</button>
+        <div class="row">
+          <span>pointer</span>
+          <div class="toggle" id="tool" role="group">
+            <button type="button" data-tool="erase" class="on">erase</button>
+            <button type="button" data-tool="seed">add ants</button>
+          </div>
+        </div>
+
+        <label class="row">
+          <span>ants per click <b id="crowdRead">8</b></span>
+          <input id="crowd" type="range" min="1" max="16" value="8" step="1">
+        </label>
+
+        <label class="row">
+          <span>eraser size</span>
+          <input id="brush" type="range" min="1" max="12" value="5" step="1">
+        </label>
+
+        <div class="keys">
+          <button id="play" class="on">pause</button>
+          <button id="once">step</button>
+          <button id="restart">restart</button>
+          <button id="clear">clear</button>
+        </div>
+
+        <p class="tip">
+          Erase part of the drawing and the colony repairs it. Add ants
+          somewhere else and they start a second one.
+        </p>
       </div>
     </div>
 
-    <label class="row">
-      <span>ants per drop <b id="crowdRead">8</b></span>
-      <input id="crowd" type="range" min="1" max="16" value="8" step="1">
-    </label>
-
-    <label class="row">
-      <span>eraser size</span>
-      <input id="brush" type="range" min="1" max="12" value="5" step="1">
-    </label>
-
-    <div class="buttons">
-      <button id="play" class="is-on">⏸ pause</button>
-      <button id="once">↷ nudge</button>
-      <button id="restart">🍁 restart</button>
-      <button id="clear">🧹 clear</button>
+    <div class="channels">
+      <div class="head">
+        <h2>Inside every cell</h2>
+        <p class="note">3 channels are the picture · 13 are the colony's memory</p>
+      </div>
+      <canvas id="strip" width="1024" height="72"></canvas>
+      <ol class="ticks" id="ticks"></ol>
     </div>
-
-    <p class="note">
-      Cut a piece out of a finished gecko and it grows back. Drop a second crowd
-      anywhere and it builds its own gecko around <em>that</em> spot.
-    </p>
-  </section>
-
-</main>
-
-<section class="panel strip-panel">
-  <div class="panel-top">
-    <h2>Inside the cells</h2>
-    <p class="legend">channels 3–15 · the ants' own scratch space</p>
   </div>
-  <canvas id="strip" width="1024" height="72"></canvas>
-  <ol class="ticks" id="ticks"></ol>
 </section>
 
-<section class="band">
-  <div class="band-top">
-    <h2>How it works</h2>
-    <p class="legend">one ant, one step, six thousand times over</p>
+<!-- ─────────────────────────────── red ─────────────────────────────── -->
+<section class="band red">
+  <div class="inner">
+    <h2 class="section">What one ant does, every step</h2>
+
+    <ol class="steps">
+      <li>
+        <b>Look</b>
+        <p>The ant reads the 3×3 cells around it and measures how the values
+          change across them. The measurements are rotated to match the way it
+          is facing.</p>
+      </li>
+      <li>
+        <b>Add its own position</b>
+        <p>It also knows how far it has walked from the cell it started on. It
+          has no other sense of where it is.</p>
+      </li>
+      <li>
+        <b>Run the network</b>
+        <p>Those 93 numbers go through one small network of 14,483 weights,
+          which returns 19 numbers.</p>
+      </li>
+      <li>
+        <b>Write and turn</b>
+        <p>16 of them are added to the cell underneath. The other 3 pick a
+          turn — left, straight, or right — and the ant steps forward.</p>
+      </li>
+    </ol>
+
+    <p class="after">Repeat six thousand times and a gecko is on the grid.</p>
   </div>
-
-  <ol class="steps">
-    <li>
-      <span class="k">01</span>
-      <h3>Reads</h3>
-      <p>Gradients across the 3×3 patch under it, turned into the frame it
-        faces. It sees nothing further, ever.</p>
-    </li>
-    <li>
-      <span class="k">02</span>
-      <h3>Thinks</h3>
-      <p>Those, and how far it has walked from where it woke up, through one
-        network of 14,483 numbers.</p>
-    </li>
-    <li>
-      <span class="k">03</span>
-      <h3>Writes and turns</h3>
-      <p>A delta into the cell below, then a turn sampled from three: left,
-        straight on, or right. Then it steps.</p>
-    </li>
-  </ol>
-
-  <dl class="facts">
-    <div>
-      <dt>Carries</dt>
-      <dd>A position and a heading, and nothing else.</dd>
-    </div>
-    <div>
-      <dt>Frame</dt>
-      <dd>Egocentric. Rotate the ant and the drawing turns with it.</dd>
-    </div>
-    <div>
-      <dt>A cell</dt>
-      <dd>Sixteen numbers: three the picture, thirteen scratch.</dd>
-    </div>
-    <div>
-      <dt>Crowd</dt>
-      <dd>One brain runs them all, whether one ant or nine.</dd>
-    </div>
-    <div>
-      <dt>Learned</dt>
-      <dd>Backprop for painting, trial and error for walking.</dd>
-    </div>
-    <div>
-      <dt>Repair</dt>
-      <dd>Never trained. Damage was never shown to it, yet cut a piece away
-        and the colony puts it back.</dd>
-    </div>
-  </dl>
 </section>
 
-<section class="band">
-  <div class="band-top">
-    <h2>Train your own</h2>
-    <p class="legend">a couple of hours on a gpu</p>
-  </div>
+<!-- ────────────────────────────── paper ────────────────────────────── -->
+<section class="band paper">
+  <div class="inner">
+    <h2 class="section dark">Worth knowing</h2>
 
-  <div class="split">
-<pre><code><span class="said"># clone and install</span>
+    <dl class="facts">
+      <div>
+        <dt>Repair was never trained</dt>
+        <dd>The colony was only ever shown a blank grid. Nobody taught it to
+          fix damage, yet erase part of the drawing and it fills the gap back
+          in.</dd>
+      </div>
+      <div>
+        <dt>No memory</dt>
+        <dd>An ant keeps a position and a heading between steps, and nothing
+          else. Every decision starts over.</dd>
+      </div>
+      <div>
+        <dt>No talking</dt>
+        <dd>Ants never signal one another. They share a grid, and that is the
+          only thing that connects them.</dd>
+      </div>
+      <div>
+        <dt>One network, any number of ants</dt>
+        <dd>The same 14,483 weights run every ant. One ant draws the gecko
+          slowly; nine draw it quickly.</dd>
+      </div>
+      <div>
+        <dt>Everything is relative</dt>
+        <dd>What an ant senses is measured from the way it faces, so turning it
+          at the start turns the whole drawing.</dd>
+      </div>
+      <div>
+        <dt>Two kinds of learning</dt>
+        <dd>Backprop teaches it what to write. The turns are discrete, so those
+          are learned by trial and error instead.</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<!-- ────────────────────────────── train ────────────────────────────── -->
+<section class="band paper edge">
+  <div class="inner train">
+    <div>
+      <h2 class="section dark">Train your own</h2>
+      <p>
+        Pick any emoji and grow that instead. A run takes a couple of hours on
+        a gpu, and you can watch the picture improve while it goes.
+      </p>
+      <p>
+        It writes a folder under <code>out/</code> holding the drawing as it
+        stands, the error curve, and the best network so far. Stop it whenever
+        you like — the best one is already saved.
+      </p>
+      <p class="more">
+        <a href="https://github.com/ichko/nants">Code and full write-up on GitHub →</a>
+      </p>
+    </div>
+
+<pre><code><span class="c"># install</span>
 git clone https://github.com/ichko/nants
 cd nants &amp;&amp; uv sync
 
-<span class="said"># pick an emoji at the top, then leave it running</span>
+<span class="c"># change the emoji at the top, then run it</span>
 uv run python starter/my_nants.py
 
-<span class="said"># one to nine ants a colony, damaged halfway</span>
+<span class="c"># render what it learned</span>
 uv run nants-crowd out/&lt;datetime&gt;</code></pre>
-    <div class="beside">
-      <p>
-        It writes a folder under <code>out/</code> you can watch while it
-        works: the picture as it stands, the error curve, and the best brain
-        so far.
-      </p>
-      <p>
-        Stop it whenever you like. The good one is already on disk, and
-        pointing the trainer back at the same folder carries on from there.
-      </p>
-      <p class="callout">
-        <a href="https://github.com/ichko/nants">The code, and the longer story, on GitHub →</a>
-      </p>
-    </div>
   </div>
 </section>
 
-<footer class="bar foot">
-  <p>Built for ALIFE 2026 in Waterloo 🍁</p>
+<!-- ─────────────────────────────── red ─────────────────────────────── -->
+<footer class="band deep">
+  <div class="inner">
+    <p>Built for ALIFE 2026 · Waterloo, Ontario 🍁</p>
+  </div>
 </footer>
 
 <script src="weights.js"></script>
-<script type="module" src="main.js?v=202608160616"></script>
+<script type="module" src="main.js?v=6"></script>
 <script>
   const ticks = document.getElementById("ticks");
   for (let c = 3; c < 16; c++) {
