@@ -232,14 +232,19 @@ dom("restart").addEventListener("click", () => {
   began = 0; // play the opening again
 });
 
-for (const [key, id] of [[" ", "play"], ["c", "clear"], ["r", "restart"]]) {
-  window.addEventListener("keydown", (event) => {
-    if (event.key === key && event.target === document.body) {
-      event.preventDefault();
-      dom(id).click();
-    }
-  });
-}
+const SHORTCUTS = { " ": "play", c: "clear", r: "restart" };
+
+window.addEventListener("keydown", (event) => {
+  // ctrl-c is for copying, not for clearing the field
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
+  if (event.target !== document.body) return;
+  if (!window.getSelection().isCollapsed) return; // something is selected
+
+  const id = SHORTCUTS[event.key];
+  if (!id) return;
+  event.preventDefault();
+  dom(id).click();
+});
 
 reset(true);
 requestAnimationFrame(tick);
