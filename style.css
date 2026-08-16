@@ -96,9 +96,11 @@ h2 {
 .bar a { color: #fff; }
 .bar a:hover { color: var(--sand); }
 .foot {
+  display: block;
   margin-top: 12px;
-  padding: 10px 2px 2px;
+  padding: 12px 2px 4px;
   border-top: 1px solid var(--red-lift);
+  text-align: center;
 }
 
 /* ---- cards ---- */
