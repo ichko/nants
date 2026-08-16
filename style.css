@@ -125,7 +125,9 @@ canvas {
   max-width: 358px;
   margin: 0 auto;
 }
-#stage { aspect-ratio: 1; cursor: none; }
+#stage { aspect-ratio: 1; cursor: crosshair; }
+/* with the eraser the faint disc is the cursor, so hide the real one */
+.field-wrap.show-ghost #stage { cursor: none; }
 
 /* only the field itself swallows gestures, so the rest of the page can be
    scrolled, selected and copied as usual */
