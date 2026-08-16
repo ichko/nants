@@ -67,7 +67,6 @@ header.red { border-top: none; }
 .deep {
   background-color: var(--deep);
   color: rgba(255, 255, 255, 0.78);
-  border-top: 8px solid var(--sand);
 }
 .paper {
   background-color: var(--paper);
@@ -467,8 +466,11 @@ p code { padding: 1px 5px; border-radius: 3px; background: var(--sand); color: v
 /* ---- the citation ------------------------------------------------------ */
 
 /* the whole band is the container: cream, edge to edge, nothing boxed in it */
-.cream { background: var(--cream); }
-.cream .inner { padding-top: 26px; padding-bottom: 30px; }
+.cream {
+  background: var(--cream);
+  border-top: 1px dashed var(--line);  /* the only line it needs */
+}
+.cream .inner { padding-top: 16px; padding-bottom: 18px; }
 .cream .head { margin-bottom: 8px; }
 
 pre.cite {
