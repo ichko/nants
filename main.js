@@ -35,7 +35,7 @@ toolBar.addEventListener("click", (event) => {
 });
 const playing = { on: true };
 
-const HOLD = 0;      // no waiting about: the ramp is gentle enough on its own
+const HOLD = 500;    // a beat on the empty grid, so the start is visible
 const WINDUP = 7000; // then wind up to CRUISE over this long
 const CRUISE = 500;  // steps a second, until the slider is touched
 const FLOOR = 14;    // the rate it opens at, so it never looks stalled

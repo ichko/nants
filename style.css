@@ -55,7 +55,7 @@ a { color: inherit; }
 /* a thick sand rule wherever red meets paper */
 .red {
   background-color: var(--red);
-  background-image: url("dashes.svg");
+  background-image: url("dashes.svg?v=9");
   color: #fff;
   border-top: 8px solid var(--sand);
   border-bottom: 8px solid var(--sand);
@@ -68,7 +68,7 @@ header.red { border-top: none; }
 }
 .paper {
   background-color: var(--paper);
-  background-image: url("dots.svg");
+  background-image: url("dots.svg?v=9");
 }
 /* dashed rules where two bands of the same colour meet */
 .paper + .paper .inner { padding-top: 32px; border-top: 1px dashed var(--line); }
