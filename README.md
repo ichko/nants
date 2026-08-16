@@ -1,4 +1,4 @@
-# nants — neural ants, in the browser
+# 🐜 Neural Ants — NAnts, in the browser
 
 Serve the folder and open it — the page uses ES modules, which Chrome refuses to
 load straight off `file://`:

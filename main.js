@@ -1,7 +1,7 @@
 // Wiring: the colony, the two views, and the controls around them.
 
-import { Colony, BASE, MAX, CELL } from "./sim.js?v=27";
-import { View } from "./view.js?v=27";
+import { Colony, BASE, MAX, CELL } from "./sim.js?v=28";
+import { View } from "./view.js?v=28";
 
 // if anything below throws, say so on the page: a phone has no console
 window.addEventListener("error", (event) => {

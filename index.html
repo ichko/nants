@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Fraunces:opsz,wght@9..144,400;9..144,500&family=JetBrains+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="style.css?v=27">
+<link rel="stylesheet" href="style.css?v=28">
 </head>
 <body>
 
@@ -245,9 +245,12 @@ uv run nants-crowd out/&lt;datetime&gt;</code></pre>
 
 <!-- ────────────────────────────── cite ─────────────────────────────── -->
 <section class="band paper edge">
-  <div class="inner cite-row">
-    <h2>Cite this</h2>
-<pre class="cite"><code>@software{zhechev2026nants,
+  <div class="inner">
+    <div class="head">
+      <h2>Cite this</h2>
+      <button id="copyCite" type="button" class="ghost-button">copy</button>
+    </div>
+<pre class="cite"><code id="citeText">@software{zhechev2026nants,
   author = {Zhechev, Iliya},
   title  = {Neural Ants: a learned Langton's ant},
   year   = {2026},
@@ -262,8 +265,8 @@ uv run nants-crowd out/&lt;datetime&gt;</code></pre>
   </div>
 </footer>
 
-<script src="weights.js?v=27"></script>
-<script type="module" src="main.js?v=27"></script>
+<script src="weights.js?v=28"></script>
+<script type="module" src="main.js?v=28"></script>
 <script>
   const ticks = document.getElementById("ticks");
   for (let c = 3; c < 16; c++) {
@@ -271,6 +274,13 @@ uv run nants-crowd out/&lt;datetime&gt;</code></pre>
     item.textContent = c;
     ticks.appendChild(item);
   }
+  const copyCite = document.getElementById("copyCite");
+  copyCite.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(document.getElementById("citeText").textContent);
+    copyCite.textContent = "copied";
+    setTimeout(() => { copyCite.textContent = "copy"; }, 1400);
+  });
+
   const crowd = document.getElementById("crowd");
   const crowdRead = document.getElementById("crowdRead");
   crowd.addEventListener("input", () => { crowdRead.textContent = crowd.value; });
