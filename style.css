@@ -59,7 +59,7 @@ a { color: inherit; }
   background-color: var(--red);
   /* flat uniform grain: one random grey per pixel, kept crisp rather than
      smoothed, and blended so the red itself never shifts */
-  background-image: url("grain.png?v=17");
+  background-image: url("grain.png?v=18");
   background-size: 128px 128px;
   background-blend-mode: soft-light;
   image-rendering: pixelated;
