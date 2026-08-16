@@ -189,7 +189,9 @@ h2 {
 canvas {
   display: block;
   width: 100%;
-  background: var(--ink);
+  /* white, like the field the ants paint on: if the script ever fails to
+     start, the empty canvas should look like a blank grid, not a dead screen */
+  background: var(--white);
   border-radius: 3px;
   image-rendering: pixelated;
 }
