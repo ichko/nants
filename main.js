@@ -1,7 +1,7 @@
 // Wiring: the colony, the two views, and the controls around them.
 
-import { Colony, BASE, MAX, CELL } from "./sim.js?v=38";
-import { View } from "./view.js?v=38";
+import { Colony, BASE, START, MAX, CELL } from "./sim.js?v=39";
+import { View } from "./view.js?v=39";
 
 // if anything below throws, say so on the page: a phone has no console
 window.addEventListener("error", (event) => {
@@ -68,6 +68,8 @@ stampBar.addEventListener("click", (event) => {
 // zooming out gives the ants more room; the drawing stays where it is
 zoom.min = BASE;
 zoom.max = MAX;
+zoom.value = colony.size;
+dom("zoomRead").textContent = `${colony.size}x${colony.size}`;
 zoom.addEventListener("input", () => {
   const cells = Number(zoom.value);
   colony.resize(cells);

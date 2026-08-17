@@ -2,7 +2,8 @@
 // Each ant is memoryless: it reads its 3x3 patch, its own odometer and a clock,
 // then writes to the cell below and turns left, straight on, or right.
 
-const BASE = 48; // the field the ants were trained on, wrapping at the edges
+const BASE = 48;  // the field the ants were trained on, wrapping at the edges
+const START = 64; // what the page opens at: room for a second creature
 const MAX = 256; // zoomed out: many more cells, same box on screen
 const CELL = 16; // channels per cell: 3 visible, 13 the ants' own scratch
 const HORIZON = 6000; // steps the clock is scaled to
@@ -42,7 +43,7 @@ function brainOf(weights) {
 export class Colony {
   // brains: { name: weights }. Every ant carries the name of the one it uses,
   // so several creatures can be drawn on the one field at the same time.
-  constructor(brains, size = BASE) {
+  constructor(brains, size = START) {
     this.brains = {};
     for (const name of Object.keys(brains)) this.brains[name] = brainOf(brains[name]);
     this.kinds = Object.keys(this.brains);
@@ -254,4 +255,4 @@ export class Colony {
   }
 }
 
-export { BASE, MAX, CELL, HORIZON, RING };
+export { BASE, START, MAX, CELL, HORIZON, RING };
