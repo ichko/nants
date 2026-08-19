@@ -502,6 +502,11 @@ p code { padding: 1px 5px; border-radius: 3px; background: var(--sand); color: v
   transition: background 110ms linear, transform 90ms linear, box-shadow 90ms linear;
 }
 .big-button:hover { background: var(--deep); }
+.signup .aside { margin: 14px auto 0; font-size: 13px; }
+.signup .aside a { color: var(--red); text-decoration: none; border-bottom: 1px solid var(--sand); }
+.signup .aside a:hover { border-bottom-color: var(--red); }
+.signup p a.plain { color: var(--red); text-decoration: none; border-bottom: 1px solid var(--sand); }
+.signup p a.plain:hover { border-bottom-color: var(--red); }
 .big-button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--deep); }
 
 /* ---- the citation ------------------------------------------------------ */
