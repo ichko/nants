@@ -466,6 +466,32 @@ pre .c { color: #9a8c7c; }
 code { font-family: var(--mono); font-size: 13px; }
 p code { padding: 1px 5px; border-radius: 3px; background: var(--sand); color: var(--ink); }
 
+/* ---- the hackathon call ------------------------------------------------ */
+
+.signup .inner { padding-top: 26px; padding-bottom: 28px; text-align: center; }
+.signup h2 { color: var(--red); }
+.signup p {
+  max-width: 32em;
+  margin: 8px auto 18px;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.big-button {
+  display: inline-block;
+  padding: 14px 30px;
+  background: var(--red);
+  border: 1px solid var(--deep);
+  border-radius: 5px;
+  box-shadow: 3px 3px 0 var(--deep);
+  color: #fff;
+  font: 700 17px var(--text);
+  text-decoration: none;
+  transition: background 110ms linear, transform 90ms linear, box-shadow 90ms linear;
+}
+.big-button:hover { background: var(--deep); }
+.big-button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--deep); }
+
 /* ---- the citation ------------------------------------------------------ */
 
 /* the whole band is the container: cream, edge to edge, nothing boxed in it */
