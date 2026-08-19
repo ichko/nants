@@ -448,6 +448,10 @@ button.is-on:hover { background: var(--deep); box-shadow: 2px 2px 0 var(--ink); 
 .more a { color: var(--red); font-weight: 500; text-decoration: none; border-bottom: 1px solid var(--sand); }
 .more a:hover { border-bottom-color: var(--red); }
 
+.footnote { margin: 10px 0 0; font-size: 12.5px; color: var(--muted); }
+.footnote a { color: var(--red); text-decoration: none; border-bottom: 1px solid var(--sand); }
+.footnote a:hover { border-bottom-color: var(--red); }
+
 pre {
   margin: 0;
   padding: 16px 18px;
@@ -465,44 +469,6 @@ pre code { font-family: var(--mono); }
 pre .c { color: #9a8c7c; }
 code { font-family: var(--mono); font-size: 13px; }
 p code { padding: 1px 5px; border-radius: 3px; background: var(--sand); color: var(--ink); }
-
-/* ---- the hackathon call ------------------------------------------------ */
-
-/* sand, so the call to register is plainly not the citation below it */
-.signup {
-  background-color: var(--sand);
-  background-image: url("trace.svg?v=47");
-  border-top: 1px dashed var(--sand-deep);
-}
-.signup .inner { padding-top: 30px; padding-bottom: 32px; text-align: center; }
-.signup h2 { color: var(--red); }
-.signup p {
-  max-width: 32em;
-  margin: 8px auto 20px;
-  font-size: 15px;
-  color: #7a6a56;  /* muted, but warm enough to sit on sand */
-}
-
-
-.big-button {
-  display: inline-block;
-  padding: 14px 30px;
-  background: var(--red);
-  border: 1px solid var(--deep);
-  border-radius: 5px;
-  box-shadow: 3px 3px 0 var(--deep);
-  color: #fff;
-  font: 700 17px var(--text);
-  text-decoration: none;
-  transition: background 110ms linear, transform 90ms linear, box-shadow 90ms linear;
-}
-.big-button:hover { background: var(--deep); }
-.signup .aside { margin: 14px auto 0; font-size: 13px; }
-.signup .aside a { color: var(--red); text-decoration: none; border-bottom: 1px solid var(--sand-deep); }
-.signup .aside a:hover { border-bottom-color: var(--red); }
-.signup p a.plain { color: var(--red); text-decoration: none; border-bottom: 1px solid var(--sand-deep); }
-.signup p a.plain:hover { border-bottom-color: var(--red); }
-.big-button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--deep); }
 
 /* ---- the citation ------------------------------------------------------ */
 
