@@ -468,13 +468,19 @@ p code { padding: 1px 5px; border-radius: 3px; background: var(--sand); color: v
 
 /* ---- the hackathon call ------------------------------------------------ */
 
+/* sand, so the call to register is plainly not the citation below it */
+.signup {
+  background-color: var(--sand);
+  background-image: url("trace.svg?v=47");
+  border-top: 1px dashed var(--sand-deep);
+}
 .signup .inner { padding-top: 30px; padding-bottom: 32px; text-align: center; }
 .signup h2 { color: var(--red); }
 .signup p {
   max-width: 32em;
   margin: 8px auto 20px;
   font-size: 15px;
-  color: var(--muted);
+  color: #7a6a56;  /* muted, but warm enough to sit on sand */
 }
 
 
@@ -492,9 +498,9 @@ p code { padding: 1px 5px; border-radius: 3px; background: var(--sand); color: v
 }
 .big-button:hover { background: var(--deep); }
 .signup .aside { margin: 14px auto 0; font-size: 13px; }
-.signup .aside a { color: var(--red); text-decoration: none; border-bottom: 1px solid var(--sand); }
+.signup .aside a { color: var(--red); text-decoration: none; border-bottom: 1px solid var(--sand-deep); }
 .signup .aside a:hover { border-bottom-color: var(--red); }
-.signup p a.plain { color: var(--red); text-decoration: none; border-bottom: 1px solid var(--sand); }
+.signup p a.plain { color: var(--red); text-decoration: none; border-bottom: 1px solid var(--sand-deep); }
 .signup p a.plain:hover { border-bottom-color: var(--red); }
 .big-button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--deep); }
 
