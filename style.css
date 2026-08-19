@@ -477,17 +477,6 @@ p code { padding: 1px 5px; border-radius: 3px; background: var(--sand); color: v
   color: var(--muted);
 }
 
-/* the opening line and the call to register, side by side, so the button is
-   on screen the moment the page opens */
-.opening {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 28px;
-  flex-wrap: wrap;
-  margin-bottom: 28px;
-}
-.opening .lede { margin-bottom: 0; }
 
 .big-button {
   display: inline-block;
