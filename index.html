@@ -17,7 +17,7 @@
   gtag('js', new Date());
   gtag('config', 'G-XYKY4Q36XR');
 </script>
-<link rel="stylesheet" href="style.css?v=42">
+<link rel="stylesheet" href="style.css?v=43">
 </head>
 <body>
 
@@ -54,10 +54,14 @@
 <!-- ────────────────────────────── paper ────────────────────────────── -->
 <section class="band paper">
   <div class="inner">
-    <p class="lede">
-      NAnts are to Langton's ant what NCAs are to cellular automata: the rule is
-      learned rather than written by hand.
-    </p>
+    <div class="opening">
+      <p class="lede">
+        NAnts are to Langton's ant what NCAs are to cellular automata: the rule is
+        learned rather than written by hand.
+      </p>
+      <a class="big-button" href="https://forms.gle/3SP8L8Rv1WQCdpvE9"
+         target="_blank" rel="noopener">Register your project →</a>
+    </div>
 
     <div class="workbench">
       <div class="field">
@@ -141,16 +145,6 @@
       <canvas id="strip" width="1024" height="72"></canvas>
       <ol class="ticks" id="ticks"></ol>
     </div>
-  </div>
-</section>
-
-<!-- ───────────────────────────── register ──────────────────────────── -->
-<section class="band cream signup">
-  <div class="inner">
-    <h2>Hackathon</h2>
-    <p>Bring your own creature, or something the ants have never done before.</p>
-    <a class="big-button" href="https://forms.gle/3SP8L8Rv1WQCdpvE9"
-       target="_blank" rel="noopener">Register your project →</a>
   </div>
 </section>
 
@@ -283,8 +277,8 @@ uv run nants-crowd out/&lt;datetime&gt;</code></pre>
   </div>
 </footer>
 
-<script src="weights.js?v=42"></script>
-<script type="module" src="main.js?v=42"></script>
+<script src="weights.js?v=43"></script>
+<script type="module" src="main.js?v=43"></script>
 <script>
   const ticks = document.getElementById("ticks");
   for (let c = 3; c < 16; c++) {
