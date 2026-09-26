@@ -80,6 +80,18 @@
     cursor: pointer;
   }
   button:hover { border-color: var(--muted); }
+  a.back {
+    font: 500 10px/1 "JetBrains Mono", ui-monospace, Menlo, monospace;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 5px 8px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  a.back:hover { border-color: var(--muted); }
   button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
   button:focus-visible, select:focus-visible, input:focus-visible {
     outline: 2px solid var(--accent);
@@ -174,7 +186,7 @@
 
 <div class="app">
   <div class="bar">
-    <div class="brand"><a href="../" style="color:inherit;text-decoration:none">NAnts<span>·</span>Lab</a></div>
+    <div class="brand">NAnts<span>·</span>Lab</div>
     <div class="transport">
       <button id="play" class="primary" type="button">Pause</button>
       <button id="step1" type="button">Step</button>
@@ -187,6 +199,7 @@
       <span>grid <b id="rGrid">0</b></span>
       <span>fps <b id="rFps">0</b></span>
     </div>
+    <a class="back" href="../">&larr; Back to NAnts</a>
   </div>
 
   <div class="split">
