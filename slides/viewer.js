@@ -4,13 +4,14 @@
 // sandboxed iframe made the moment it is revealed, so its first paint is the click.
 (async function () {
   const stage = document.getElementById('stage'), pos = document.getElementById('pos');
-  const deck = await (await fetch('project/deck.json')).json();
+  const V = '?v=' + (document.currentScript && /v=(\d+)/.exec(document.currentScript.src) || [0, '0'])[1]; // the same stamp as viewer.js, so a new deploy is fetched afresh
+  const deck = await (await fetch('project/deck.json' + V)).json();
   for (const f of Object.values(deck.faces || {})) if (f.href) {
     const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = f.href; document.head.appendChild(l);
   }
   const order = deck.order;
   const html = {};
-  await Promise.all(order.map(async id => { html[id] = await (await fetch('project/slides/' + id + '.html')).text(); }));
+  await Promise.all(order.map(async id => { html[id] = await (await fetch('project/slides/' + id + '.html' + V)).text(); }));
 
   let at = 0, step = 0, section = null, steps = 0;
   // The slides are 16:9. On a screen that is only a little taller, a MacBook's
