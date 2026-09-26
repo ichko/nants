@@ -151,34 +151,24 @@ h1 {
   flex-wrap: wrap;
   margin-bottom: 28px;
 }
-.lede-row .lede { margin-bottom: 0; max-width: 26em; }
+.lede-row .lede { margin-bottom: 0; max-width: 34em; }
 
-/* the one link that leaves the page: a proper button, red, with the flag's rule */
-.labgo { margin-left: auto; text-align: right; }
+/* the link to the lab: the site's own button, worn by an <a> */
+.labgo { margin-left: auto; }
 .labgo a {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 13px 20px;
-  font: 700 14px/1 var(--mono);
-  letter-spacing: 0.01em;
-  color: #fff;
-  background: var(--red);
-  border: 1px solid var(--deep);
-  border-bottom: 4px solid var(--sand);
+  display: inline-block;
+  font: 500 12.5px var(--text);
+  color: var(--deep);
+  background: var(--sand);
+  border: 1px solid var(--sand-deep);
   border-radius: 5px;
+  padding: 6px 8px;
   text-decoration: none;
-  box-shadow: 3px 3px 0 var(--deep);
-  transition: background 90ms linear, box-shadow 90ms linear, transform 90ms linear;
+  box-shadow: 2px 2px 0 var(--sand-deep);
+  transition: background 90ms linear, color 90ms linear, border-color 90ms linear;
 }
-.labgo a::after {
-  content: "\2192";
-  font-size: 16px;
-  transition: transform 140ms ease;
-}
-.labgo a:hover { background: var(--deep); box-shadow: 3px 3px 0 var(--ink); }
-.labgo a:hover::after { transform: translateX(3px); }
-.labgo a:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.labgo a:hover { background: var(--red); border-color: var(--deep); color: #fff; box-shadow: 2px 2px 0 var(--deep); }
+.labgo a:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--deep); }
 
 .lede {
   max-width: 34em;
