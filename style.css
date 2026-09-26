@@ -339,16 +339,12 @@ button.is-on {
 button.is-on:hover { background: var(--deep); box-shadow: 2px 2px 0 var(--ink); }
 :focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 
+/* erase / stamp: two ordinary buttons side by side, each with its own shadow, hover and press */
 .toggle {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border-radius: 5px;
-  box-shadow: 2px 2px 0 var(--sand-deep);
+  gap: 7px;
 }
-.toggle button { border-radius: 0; border-right-width: 0; box-shadow: none; }
-.toggle button:active { transform: none; }
-.toggle button:first-child { border-radius: 5px 0 0 5px; }
-.toggle button:last-child { border-radius: 0 5px 5px 0; border-right-width: 1px; }
 
 /* the creature stamps: emoji big enough to read, six across */
 .stamps {
