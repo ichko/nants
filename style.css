@@ -157,8 +157,9 @@ h1 {
 .labgo { margin-left: auto; }
 .labgo a {
   display: inline-block;
-  padding: 8px 12px;
-  font: 500 14px var(--text);
+  padding: 8px 14px;
+  text-align: center;
+  font: 700 14px var(--text);
   color: var(--deep);
   background: var(--sand);
   border: 1px solid var(--sand-deep);
