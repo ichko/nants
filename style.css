@@ -154,7 +154,7 @@ h1 {
 .lede-row .lede { margin-bottom: 0; max-width: 34em; }
 
 /* the link to the lab: the site's own button, worn by an <a> */
-.labgo { margin-left: auto; }
+.labgo { margin-left: auto; text-align: right; }
 .labgo a {
   display: inline-block;
   padding: 8px 14px;
