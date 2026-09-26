@@ -245,6 +245,36 @@ canvas {
 }
 .field-wrap.show-ghost #ghost { display: block; }
 
+/* the origins: one faded dot per colony, only when asked for, draggable */
+#origins { position: absolute; inset: 0; pointer-events: none; display: none; }
+.field-wrap.show-origins #origins { display: block; }
+.origin {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px rgba(36, 29, 25, 0.35);
+  opacity: 0.45;
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: none;
+  transition: opacity 90ms linear;
+}
+.origin:hover, .origin.is-held { opacity: 0.9; cursor: grabbing; }
+.origins-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.origins-toggle input { accent-color: var(--red); margin: 0; }
+.origins-toggle em { font-style: normal; opacity: 0.7; }
+
 /* the zoom sits under the field it changes, not away in the controls */
 .zoomer {
   display: flex;

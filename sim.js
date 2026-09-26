@@ -65,6 +65,7 @@ export class Colony {
       }
     }
     this.ants = [];
+    this.colonies = []; // one per stamp: where its ants reckon from
     this.t = 0;
   }
 
@@ -98,6 +99,11 @@ export class Colony {
       ant.oy += shift;
       return ant.x >= 0 && ant.x < size && ant.y >= 0 && ant.y < size;
     });
+    for (const home of this.colonies) {
+      home.x += shift;
+      home.y += shift;
+    }
+    this.colonies = this.colonies.filter((home) => this.ants.some((ant) => ant.home === home));
 
     this.size = size;
     this.field = next;
@@ -105,18 +111,35 @@ export class Colony {
 
   seed(x, y, count, spin, kind = this.kinds[0]) {
     const SIZE = this.size;
+    const home = { x: ((x % SIZE) + SIZE) % SIZE, y: ((y % SIZE) + SIZE) % SIZE, kind };
+    this.colonies.push(home);
     for (let i = 0; i < count; i++) {
       const heading = spin ? (Math.random() * 4) | 0 : 0;
       this.ants.push({
         kind,
-        x: ((x % SIZE) + SIZE) % SIZE,
-        y: ((y % SIZE) + SIZE) % SIZE,
-        ox: ((x % SIZE) + SIZE) % SIZE,
-        oy: ((y % SIZE) + SIZE) % SIZE,
+        home,
+        x: home.x,
+        y: home.y,
+        ox: home.x,
+        oy: home.y,
         heading,
         start: heading,
         flip: 1,
       });
+    }
+    return home;
+  }
+
+  // slide a colony's origin: every ant of it now reckons its position from
+  // the new spot, so the picture it keeps is anchored there instead
+  moveOrigin(home, x, y) {
+    const SIZE = this.size;
+    home.x = ((x % SIZE) + SIZE) % SIZE;
+    home.y = ((y % SIZE) + SIZE) % SIZE;
+    for (const ant of this.ants) {
+      if (ant.home !== home) continue;
+      ant.ox = home.x;
+      ant.oy = home.y;
     }
   }
 

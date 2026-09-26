@@ -1,7 +1,7 @@
 // Wiring: the colony, the two views, and the controls around them.
 
-import { Colony, BASE, START, MAX, CELL } from "./sim.js?v=48";
-import { View } from "./view.js?v=48";
+import { Colony, BASE, START, MAX, CELL } from "./sim.js?v=49";
+import { View } from "./view.js?v=49";
 
 // if anything below throws, say so on the page: a phone has no console
 window.addEventListener("error", (event) => {
@@ -154,7 +154,78 @@ function paint() {
 
   dom("stepCount").textContent = colony.t.toLocaleString();
   dom("antCount").textContent = colony.ants.length;
+  placeOrigins();
 }
+
+// ---- the origins: a faded dot where each colony reckons from ----------------
+// Every ant carries its distance from the spot it was stamped on; that spot
+// is the anchor of the picture it keeps drawing. Drag the dot and the whole
+// colony re-anchors: the ants carry on, now measuring from the new place.
+
+const originsLayer = dom("origins");
+const showOrigins = dom("showOrigins");
+const dotOf = new Map(); // colony -> its dot
+let held = null; // the colony being dragged, if any
+
+showOrigins.addEventListener("change", () => {
+  wrap.classList.toggle("show-origins", showOrigins.checked);
+});
+
+function placeOrigins() {
+  if (!showOrigins.checked) return;
+  const box = stage.canvas.getBoundingClientRect();
+  const nest = wrap.getBoundingClientRect();
+  const alive = new Set(colony.colonies);
+  for (const [home, dot] of dotOf) {
+    if (!alive.has(home)) { dot.remove(); dotOf.delete(home); }
+  }
+  for (const home of colony.colonies) {
+    let dot = dotOf.get(home);
+    if (!dot) {
+      dot = document.createElement("div");
+      dot.className = "origin";
+      const [r, g, b] = COLOURS[home.kind] || COLOURS.gecko;
+      dot.style.background = `rgb(${r * 255 | 0}, ${g * 255 | 0}, ${b * 255 | 0})`;
+      dot.title = `${home.kind} colony: drag to move its origin`;
+      dot.addEventListener("mousedown", (event) => { event.preventDefault(); hold(home, dot); });
+      dot.addEventListener("touchstart", (event) => { event.preventDefault(); hold(home, dot); }, { passive: false });
+      originsLayer.appendChild(dot);
+      dotOf.set(home, dot);
+    }
+    dot.style.left = `${box.left - nest.left + ((home.x + 0.5) / colony.size) * box.width}px`;
+    dot.style.top = `${box.top - nest.top + ((home.y + 0.5) / colony.size) * box.height}px`;
+  }
+}
+
+function hold(home, dot) {
+  held = home;
+  dot.classList.add("is-held");
+}
+
+function carry(clientX, clientY) {
+  if (!held) return;
+  const { x, y } = cellAt(clientX, clientY);
+  colony.moveOrigin(held, x, y);
+  placeOrigins();
+}
+
+function drop() {
+  if (!held) return;
+  const dot = dotOf.get(held);
+  if (dot) dot.classList.remove("is-held");
+  held = null;
+}
+
+window.addEventListener("mousemove", (event) => carry(event.clientX, event.clientY));
+window.addEventListener("mouseup", drop);
+window.addEventListener("touchmove", (event) => {
+  if (!held) return;
+  event.preventDefault();
+  const touch = event.changedTouches[0];
+  carry(touch.clientX, touch.clientY);
+}, { passive: false });
+window.addEventListener("touchend", drop);
+window.addEventListener("touchcancel", drop);
 
 function tick(now) {
   if (!began) began = now; // the opening starts when the page is actually up

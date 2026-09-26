@@ -17,7 +17,7 @@
   gtag('js', new Date());
   gtag('config', 'G-XYKY4Q36XR');
 </script>
-<link rel="stylesheet" href="style.css?v=54">
+<link rel="stylesheet" href="style.css?v=55">
 </head>
 <body>
 
@@ -74,11 +74,16 @@
         <div class="field-wrap" id="fieldWrap">
           <canvas id="stage" width="480" height="480"></canvas>
           <div id="ghost"></div>
+          <div id="origins"></div>
         </div>
         <label class="zoomer">
           <span>zoom out</span>
           <input id="zoom" type="range" min="48" max="256" value="64" step="8">
           <b id="zoomRead">64x64</b>
+        </label>
+        <label class="origins-toggle">
+          <input id="showOrigins" type="checkbox">
+          <span>show colony origins <em>drag a dot to move where its ants reckon from</em></span>
         </label>
         <p id="trouble"></p>
       </div>
@@ -282,7 +287,7 @@ uv run nants-crowd out/&lt;datetime&gt;</code></pre>
 </footer>
 
 <script src="weights.js?v=48"></script>
-<script type="module" src="main.js?v=48"></script>
+<script type="module" src="main.js?v=49"></script>
 <script>
   const ticks = document.getElementById("ticks");
   for (let c = 3; c < 16; c++) {
