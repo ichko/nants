@@ -659,7 +659,7 @@
     start: 'blob', startAmp: 1, bias: 0.2, diff: 0.1, decay: 0.01, step: 0.2, ident: 2, identMode: 'blend', twoBrains: true,
     layers: 2, width: 32, act: 1, init: 'he', scale: 1.2, temp: 1, sample: true,
     offset: false, facing: false,
-    mode: 1, gain: 1.5, speed: 8, seed: 7, playing: true
+    mode: 1, gain: 1.5, speed: 8, seed: (Math.random() * 1e6) | 0, playing: true   // a different brain on every load
   };
   let G = 2, antTex = 64, tick = 0;
   let field = [null, null], cur = 0;
@@ -1121,6 +1121,7 @@
   $('dice').addEventListener('click', newSeed);
 
   // ---------- loop ----------
+  syncUI();   // the panel shows the seed we actually started with
   allocate();
   let last = performance.now(), frames = 0, fpsAt = last;
   function frame(now) {
