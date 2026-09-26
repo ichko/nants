@@ -1,0 +1,1129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>NAnts Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A sandbox for colonies of tiny neural ants: random brains, a wrapping field, and the patterns they leave.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Fraunces:opsz,wght@9..144,400;9..144,500&family=JetBrains+Mono:wght@400;700&display=swap">
+</head>
+<body>
+<style>
+  /* the website's palette, fonts and furniture; the lab's own layout */
+  :root {
+    --red: #b00300;
+    --deep: #7d0200;
+    --paper: #fbf7f0;
+    --white: #ffffff;
+    --ink: #241d19;
+    --muted: #7b6f66;
+    --line: #e8dccb;
+    --sand: #fcdeb9;
+    --sand-deep: #efe2d0;
+    --cream: #f4ead9;
+    --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+    --text: "DM Sans", ui-sans-serif, -apple-system, "Segoe UI", Helvetica, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font: 400 13px/1.45 var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  .app { display: grid; grid-template-rows: auto 1fr; height: 100%; min-height: 0; }
+
+  /* ---- the masthead, as on the site: red band, sand rule, trails behind ---- */
+  .bar {
+    position: relative;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 10px 18px;
+    background: var(--red) url("trail.svg");
+    border-bottom: 8px solid var(--sand);
+    color: #fff;
+  }
+  .brand {
+    display: flex; align-items: baseline; gap: 9px;
+    font: 500 21px/1 var(--display);
+    white-space: nowrap;
+  }
+  .brand em { font: 700 12px/1 var(--mono); font-style: normal; color: var(--sand); letter-spacing: 0.02em; }
+  .brand a { color: rgba(255,255,255,0.72); text-decoration: none; font: 500 11px/1 var(--mono); border-bottom: 1px solid currentColor; }
+  .brand a:hover { color: #fff; }
+  .transport { display: flex; gap: 7px; flex-wrap: wrap; }
+  .readout {
+    margin-left: auto; display: flex; gap: 14px; flex-wrap: wrap;
+    font: 400 12px/1 var(--mono); font-variant-numeric: tabular-nums;
+    color: rgba(252,222,185,0.72);
+  }
+  .readout b { color: var(--sand); font-weight: 700; }
+
+  button {
+    font: 500 12px/1 var(--text);
+    color: var(--deep);
+    background: var(--sand);
+    border: 1px solid var(--sand-deep);
+    border-radius: 5px;
+    padding: 6px 9px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--deep);
+    transition: background 90ms linear, color 90ms linear, border-color 90ms linear;
+  }
+  button:hover { background: #fff; border-color: var(--sand); }
+  button:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--deep); }
+  button.primary { background: var(--white); border-color: var(--sand-deep); }
+  button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--sand); outline-offset: 2px; }
+
+  /* ---- body split ---- */
+  .split { display: grid; grid-template-columns: 250px 1fr; min-height: 0; }
+  .rail {
+    border-right: 1px solid var(--line);
+    background: var(--paper);
+    overflow-y: auto;
+    padding: 0 0 16px;
+  }
+  .stage {
+    background: var(--paper) url("../dots.svg");
+    display: grid; place-items: center; padding: 16px; min-height: 0; overflow: hidden;
+  }
+  canvas {
+    display: block; width: 100%; height: 100%;
+    object-fit: contain; image-rendering: pixelated;
+    background: var(--white);
+    border-radius: 3px;
+    outline: 1px solid var(--line);
+    outline-offset: 6px;
+  }
+
+  /* ---- control groups ---- */
+  .group { border-bottom: 1px dashed var(--line); padding: 11px 14px 13px; }
+  .group h2 {
+    margin: 0 0 9px;
+    font: 700 11px/1 var(--text);
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
+  }
+  .row { display: grid; grid-template-columns: 66px 1fr; align-items: center; gap: 8px; margin-top: 7px; }
+  .row:first-of-type { margin-top: 0; }
+  .row > label { font: 400 12.5px/1.1 var(--text); color: var(--muted); }
+  .row .val {
+    font: 500 11px/1 var(--mono); font-variant-numeric: tabular-nums;
+    color: var(--ink); text-align: right; min-width: 34px;
+  }
+  .slider { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; }
+  input[type="range"] { width: 100%; height: 16px; appearance: none; background: transparent; margin: 0; }
+  input[type="range"]::-webkit-slider-runnable-track { height: 5px; border-radius: 3px; background: var(--sand); }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none; width: 15px; height: 15px; margin-top: -5px; border-radius: 50%;
+    background: var(--red); border: 2px solid var(--white); box-shadow: 1px 1px 0 var(--deep); cursor: grab;
+  }
+  input[type="range"]::-moz-range-track { height: 5px; border-radius: 3px; background: var(--sand); }
+  input[type="range"]::-moz-range-thumb {
+    width: 13px; height: 13px; border-radius: 50%;
+    background: var(--red); border: 2px solid var(--white); cursor: grab;
+  }
+  select, input[type="number"] {
+    width: 100%;
+    font: 400 12px/1 var(--mono);
+    color: var(--ink); background: var(--white);
+    border: 1px solid var(--line); border-radius: 4px;
+    padding: 5px 6px;
+  }
+  .check { display: flex; align-items: center; gap: 7px; margin-top: 7px; }
+  .check input { accent-color: var(--red); margin: 0; width: 13px; height: 13px; }
+  .check label { font-size: 12.5px; color: var(--muted); }
+  .seedrow { display: grid; grid-template-columns: 1fr auto; gap: 6px; }
+  .note {
+    margin: 10px 14px 0;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+    font: 400 12px/1.55 var(--text); color: var(--muted);
+  }
+  .fail {
+    margin: 40px auto; max-width: 44ch; padding: 16px;
+    border: 1px solid var(--line); background: var(--white); border-radius: 5px; font-size: 13px;
+  }
+
+  @media (max-width: 760px) {
+    .split { grid-template-columns: 1fr; grid-template-rows: minmax(200px, 42vh) 1fr; }
+    .rail { border-right: 0; border-top: 1px solid var(--line); order: 2; }
+    .stage { order: 1; }
+    .readout { margin-left: 0; width: 100%; }
+  }
+</style>
+
+<div class="app">
+  <div class="bar">
+    <div class="brand">NAnts&nbsp;Lab <em>(sandbox)</em> <a href="../">&larr; back to NAnts</a></div>
+    <div class="transport">
+      <button id="play" class="primary" type="button">Pause</button>
+      <button id="step1" type="button">Step</button>
+      <button id="reset" type="button">Reset field</button>
+      <button id="reroll" type="button">New brain</button>
+    </div>
+    <div class="readout">
+      <span>step <b id="rStep">0</b></span>
+      <span>ants <b id="rAnts">0</b></span>
+      <span>grid <b id="rGrid">0</b></span>
+      <span>fps <b id="rFps">0</b></span>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="rail">
+      <div class="group">
+        <h2>Preset</h2>
+        <div class="row"><label for="cPreset">Family</label>
+          <select id="cPreset">
+            <option value="">custom</option>
+            <option value="0">Lichen</option>
+            <option value="1">Frostbloom</option>
+            <option value="2">Continents</option>
+            <option value="3">Tideline</option>
+            <option value="4">Nebula</option>
+            <option value="5">Reedbed</option>
+            <option value="6">Plates</option>
+            <option value="7">Spore</option>
+          </select></div>
+      </div>
+
+      <div class="group">
+        <h2>Field</h2>
+        <div class="row"><label for="cW">Width</label>
+          <div class="slider"><input id="cW" type="range" min="32" max="1024" step="32" value="1024"><span class="val" id="vW">1024</span></div></div>
+        <div class="row"><label for="cH">Height</label>
+          <div class="slider"><input id="cH" type="range" min="32" max="1024" step="32" value="800"><span class="val" id="vH">800</span></div></div>
+        <div class="row"><label for="cC">Channels</label>
+          <div class="slider"><input id="cC" type="range" min="1" max="16" step="1" value="6"><span class="val" id="vC">6</span></div></div>
+        <div class="row"><label for="cDiff">Diffusion</label>
+          <div class="slider"><input id="cDiff" type="range" min="0" max="1" step="0.01" value="0.1"><span class="val" id="vDiff">0.10</span></div></div>
+        <div class="row"><label for="cDecay">Decay</label>
+          <div class="slider"><input id="cDecay" type="range" min="0" max="0.1" step="0.001" value="0.01"><span class="val" id="vDecay">0.010</span></div></div>
+      </div>
+
+      <div class="group">
+        <h2>Start</h2>
+        <div class="row"><label for="cStart">Pattern</label>
+          <select id="cStart">
+            <option value="blob">gaussian blob</option>
+            <option value="dot">one centre cell</option>
+            <option value="ring">ring of noise</option>
+            <option value="disc">disc of noise</option>
+            <option value="noise">whole field noise</option>
+            <option value="blank">blank</option>
+          </select></div>
+        <div class="row"><label for="cStartAmp">Amplitude</label>
+          <div class="slider"><input id="cStartAmp" type="range" min="0" max="8" step="0.1" value="1"><span class="val" id="vStartAmp">1.0</span></div></div>
+      </div>
+
+      <div class="group">
+        <h2>Ants</h2>
+        <div class="row"><label for="cN">Count</label>
+          <div class="slider"><input id="cN" type="range" min="1" max="20000" step="1" value="3000"><span class="val" id="vN">3000</span></div></div>
+        <div class="row"><label for="cSpawn">Spawn</label>
+          <select id="cSpawn">
+            <option value="point">one point, random</option>
+            <option value="row">row on one side</option>
+            <option value="circle-in">circle, facing in</option>
+            <option value="circle-out">circle, facing out</option>
+            <option value="circle-rand">circle, random</option>
+            <option value="scatter">scattered, random</option>
+          </select></div>
+        <div class="row"><label for="cRad">Radius</label>
+          <div class="slider"><input id="cRad" type="range" min="0.05" max="0.5" step="0.01" value="0.3"><span class="val" id="vRad">0.30</span></div></div>
+        <div class="row"><label for="cIdent">Identity</label>
+          <div class="slider"><input id="cIdent" type="range" min="0" max="4" step="1" value="2"><span class="val" id="vIdent">2</span></div></div>
+        <div class="row"><label for="cIdentMode">Spread</label>
+          <select id="cIdentMode">
+            <option value="blend">blend of two</option>
+            <option value="random">one each</option>
+          </select></div>
+        <div class="check"><input id="cShow" type="checkbox"><label for="cShow">Mark ants</label></div>
+      </div>
+
+      <div class="group">
+        <h2>Brain</h2>
+        <div class="row"><label for="cL">Layers</label>
+          <div class="slider"><input id="cL" type="range" min="1" max="5" step="1" value="2"><span class="val" id="vL">2</span></div></div>
+        <div class="row"><label for="cWid">Width</label>
+          <div class="slider"><input id="cWid" type="range" min="4" max="64" step="4" value="32"><span class="val" id="vWid">32</span></div></div>
+        <div class="row"><label for="cAct">Activation</label>
+          <select id="cAct">
+            <option value="1">tanh</option>
+            <option value="0">relu</option>
+            <option value="2">leaky relu</option>
+            <option value="3">sin</option>
+            <option value="4">gelu</option>
+          </select></div>
+        <div class="row"><label for="cInit">Init</label>
+          <select id="cInit">
+            <option value="he">he (kaiming)</option>
+            <option value="xavier">xavier (glorot)</option>
+            <option value="siren">siren (use with sin)</option>
+            <option value="ortho">orthogonal</option>
+            <option value="gauss">gaussian</option>
+            <option value="uniform">uniform</option>
+            <option value="sparse">sparse</option>
+          </select></div>
+        <div class="row"><label for="cScale">Scale</label>
+          <div class="slider"><input id="cScale" type="range" min="0.1" max="3" step="0.05" value="1.2"><span class="val" id="vScale">1.20</span></div></div>
+        <div class="row"><label for="cBias">Bias</label>
+          <div class="slider"><input id="cBias" type="range" min="0" max="2" step="0.05" value="0.2"><span class="val" id="vBias">0.20</span></div></div>
+        <div class="row"><label for="cStep">Step</label>
+          <div class="slider"><input id="cStep" type="range" min="0.01" max="2" step="0.01" value="0.2"><span class="val" id="vStep">0.20</span></div></div>
+        <div class="row"><label for="cTemp">Temp</label>
+          <div class="slider"><input id="cTemp" type="range" min="0.05" max="4" step="0.05" value="1"><span class="val" id="vTemp">1.00</span></div></div>
+        <div class="check"><input id="cSample" type="checkbox" checked><label for="cSample">Sample turn (off: argmax)</label></div>
+        <div class="check"><input id="cTwo" type="checkbox" checked><label for="cTwo">Blend two brains</label></div>
+        <div class="check"><input id="cFace" type="checkbox"><label for="cFace">Feed facing</label></div>
+        <div class="check"><input id="cOff" type="checkbox"><label for="cOff">Feed offset from start</label></div>
+        <div class="row" style="margin-top:10px"><label for="cSeed">Seed</label>
+          <div class="seedrow"><input id="cSeed" type="number" value="7" min="0" step="1"><button id="dice" type="button">↻</button></div></div>
+      </div>
+
+      <div class="group">
+        <h2>View</h2>
+        <div class="row"><label for="cMode">Mapping</label>
+          <select id="cMode">
+            <option value="1">colours, majority</option>
+            <option value="2">colours, additive</option>
+            <option value="0">first 3 as RGB</option>
+          </select></div>
+        <div class="row"><label for="cGain">Gain</label>
+          <div class="slider"><input id="cGain" type="range" min="0.1" max="6" step="0.1" value="1.5"><span class="val" id="vGain">1.5</span></div></div>
+        <div class="row"><label for="cSpeed">Steps/frame</label>
+          <div class="slider"><input id="cSpeed" type="range" min="1" max="60" step="1" value="8"><span class="val" id="vSpeed">8</span></div></div>
+      </div>
+
+      <p class="note">Each ant reads its own cell, the sobel slope of the 3×3 around it in its own frame, and its heading. Brains are random, never trained. Right-click the canvas to save.</p>
+    </div>
+
+    <div class="stage"><canvas id="gl"></canvas></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('gl');
+  const gl = canvas.getContext('webgl2', { preserveDrawingBuffer: true, antialias: false, alpha: false });
+
+  function die(msg) {
+    document.querySelector('.stage').innerHTML =
+      '<div class="fail"><b>This page needs WebGL2 with float render targets.</b><br>' + msg + '</div>';
+  }
+  if (!gl) { die('Your browser did not give us a WebGL2 context.'); return; }
+  if (!gl.getExtension('EXT_color_buffer_float')) {
+    die('EXT_color_buffer_float is missing, so the field cannot be kept in float textures.'); return;
+  }
+
+  const MAX_DRAW = gl.getParameter(gl.MAX_DRAW_BUFFERS);
+  const MAX_C = Math.min(16, Math.max(4, (MAX_DRAW - 1) * 4));
+
+  // ---------- shader plumbing ----------
+  function sh(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s) + '\n' + src);
+    return s;
+  }
+  function prog(vs, fs) {
+    const p = gl.createProgram();
+    gl.attachShader(p, sh(gl.VERTEX_SHADER, vs));
+    gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+    const u = {};
+    const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < n; i++) {
+      const info = gl.getActiveUniform(p, i);
+      u[info.name] = gl.getUniformLocation(p, info.name);
+      if (info.name.endsWith('[0]')) u[info.name.slice(0, -3)] = u[info.name];
+    }
+    return { p, u };
+  }
+
+  const VS_FULL = `#version 300 es
+  precision highp float; precision highp int;
+  out vec2 vUv;
+  void main() {
+    vec2 q = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
+    vUv = q; gl_Position = vec4(q * 2.0 - 1.0, 0.0, 1.0);
+  }`;
+
+  const COMMON = `#version 300 es
+  precision highp float; precision highp int;
+  precision highp sampler2DArray; precision highp sampler2D;
+  const float SX[9] = float[9](-0.125, 0.0, 0.125, -0.25, 0.0, 0.25, -0.125, 0.0, 0.125);
+  const float SY[9] = float[9](-0.125, -0.25, -0.125, 0.0, 0.0, 0.0, 0.125, 0.25, 0.125);
+  const vec2 RING[4] = vec2[4](vec2(0.0, -1.0), vec2(1.0, 0.0), vec2(0.0, 1.0), vec2(-1.0, 0.0));
+  const float QC[4] = float[4](1.0, 0.0, -1.0, 0.0);
+  const float QS[4] = float[4](0.0, 1.0, 0.0, -1.0);
+  `;
+
+  // ---- pass A: run every brain, emit new ant state + the delta it writes ----
+  const FS_BRAIN = COMMON + `
+  uniform sampler2DArray uField;
+  uniform sampler2D uState, uOrigin, uW, uIdent;
+  uniform ivec2 uSize;
+  uniform int uC, uG, uLayers, uAct, uOffset, uSample, uAntTex, uWTexW;
+  uniform int uFacing;
+  uniform float uStep;
+  uniform int uIdN, uWHalf, uBlend;
+  uniform ivec4 uLayer[5];
+  uniform float uTemp;
+  uniform uint uTick;
+
+  layout(location = 0) out vec4 oState;
+  layout(location = 1) out vec4 oD0;
+  layout(location = 2) out vec4 oD1;
+  layout(location = 3) out vec4 oD2;
+  layout(location = 4) out vec4 oD3;
+
+  float raw(int i) {
+    int t = i >> 2;
+    vec4 v = texelFetch(uW, ivec2(t % uWTexW, t / uWTexW), 0);
+    int c = i & 3;
+    return c == 0 ? v.x : (c == 1 ? v.y : (c == 2 ? v.z : v.w));
+  }
+  // two brains sit in the texture; this ant reads its own blend of them
+  float wAt(int i, float t) { return mix(raw(i), raw(i + uWHalf), t); }
+  float act(float v) {
+    if (uAct == 0) return max(v, 0.0);
+    if (uAct == 1) return tanh(v);
+    if (uAct == 2) return v > 0.0 ? v : 0.1 * v;
+    if (uAct == 3) return sin(v);
+    return 0.5 * v * (1.0 + tanh(0.7978845608 * (v + 0.044715 * v * v * v)));
+  }
+  float nz(float v) { return isnan(v) ? 0.0 : clamp(v, -1e6, 1e6); }
+  float hash(uvec2 s) {
+    uint h = s.x * 747796405u + s.y * 2891336453u;
+    h = ((h >> ((h >> 28) + 4u)) ^ h) * 277803737u;
+    return float((h >> 22) ^ h) / 4294967296.0;
+  }
+
+  void main() {
+    ivec2 t = ivec2(gl_FragCoord.xy);
+    int id = t.y * uAntTex + t.x;
+    vec4 st = texelFetch(uState, t, 0);
+    vec4 og = texelFetch(uOrigin, t, 0);
+    ivec2 p = ivec2(st.xy);
+    int h = int(st.z);
+    float c = QC[h], s = QS[h];
+    float tb = uBlend == 1 ? og.w : 0.0;
+
+    float xv[80]; float yv[80];
+    for (int g = 0; g < 4; g++) {
+      if (g >= uG) break;
+      vec4 ctr = vec4(0.0), ax = vec4(0.0), ay = vec4(0.0);
+      for (int j = 0; j < 3; j++) {
+        for (int i = 0; i < 3; i++) {
+          ivec2 q = (p + ivec2(i - 1, j - 1) + uSize) % uSize;
+          vec4 v = clamp(texelFetch(uField, ivec3(q, g), 0), -1000.0, 1000.0);
+          ax += SX[j * 3 + i] * v;
+          ay += SY[j * 3 + i] * v;
+          if (i == 1 && j == 1) ctr = v;
+        }
+      }
+      // gradients turned into the ant's own frame
+      vec4 ahead = ax * c + ay * s;
+      vec4 aside = ay * c - ax * s;
+      for (int k = 0; k < 4; k++) {
+        int ch = g * 4 + k;
+        if (ch >= uC) break;
+        xv[ch] = ctr[k];
+        xv[uC + ch] = ahead[k];
+        xv[2 * uC + ch] = aside[k];
+      }
+    }
+    int at = 3 * uC;
+    if (uFacing == 1) {
+      vec2 face = RING[(h - int(og.z) + 4) % 4];
+      xv[at] = face.x; xv[at + 1] = face.y; at += 2;
+    }
+    if (uIdN > 0) {
+      // this ant's own fixed vector: same brain, different creature
+      vec4 me = texelFetch(uIdent, t, 0);
+      for (int k = 0; k < 4; k++) { if (k >= uIdN) break; xv[at + k] = me[k]; }
+      at += uIdN;
+    }
+    if (uOffset == 1) {
+      vec2 mid = vec2(uSize) * 0.5;
+      vec2 away = mod(vec2(p) - og.xy + mid, vec2(uSize)) - mid;
+      away /= mid;
+      xv[at] = away.x * c + away.y * s;
+      xv[at + 1] = away.y * c - away.x * s;
+    }
+
+    for (int L = 0; L < 5; L++) {
+      if (L >= uLayers) break;
+      ivec4 d = uLayer[L];
+      for (int o = 0; o < 80; o++) {
+        if (o >= d.y) break;
+        float acc = wAt(d.w + o, tb);
+        for (int i = 0; i < 80; i++) {
+          if (i >= d.x) break;
+          acc += wAt(d.z + o * d.x + i, tb) * xv[i];
+        }
+        yv[o] = acc;
+      }
+      bool last = (L == uLayers - 1);
+      for (int o = 0; o < 80; o++) {
+        if (o >= d.y) break;
+        xv[o] = last ? yv[o] : act(yv[o]);
+      }
+    }
+
+    // pick the turn from the last three outputs
+    float l0 = clamp(nz(xv[uC]) / uTemp, -20.0, 20.0);
+    float l1 = clamp(nz(xv[uC + 1]) / uTemp, -20.0, 20.0);
+    float l2 = clamp(nz(xv[uC + 2]) / uTemp, -20.0, 20.0);
+    float m = max(l0, max(l1, l2));
+    float e0 = exp(l0 - m), e1 = exp(l1 - m), e2 = exp(l2 - m);
+    float sum = e0 + e1 + e2;
+    int turn;
+    if (uSample == 1) {
+      float r = hash(uvec2(uint(id), uTick)) * sum;
+      turn = r < e0 ? -1 : (r < e0 + e1 ? 0 : 1);
+    } else {
+      turn = l0 >= l1 && l0 >= l2 ? -1 : (l1 >= l2 ? 0 : 1);
+    }
+
+    int nh = (h + turn + 4) % 4;
+    vec2 np = mod(vec2(p) + RING[nh], vec2(uSize));
+    oState = vec4(np, float(nh), st.w);
+
+    vec4 d[4] = vec4[4](vec4(0.0), vec4(0.0), vec4(0.0), vec4(0.0));
+    for (int ch = 0; ch < 16; ch++) {
+      if (ch >= uC) break;
+      // the write is squashed, so one visit can only move a cell so far
+      d[ch >> 2][ch & 3] = uStep * tanh(nz(xv[ch]));
+    }
+    oD0 = d[0]; oD1 = d[1]; oD2 = d[2]; oD3 = d[3];
+  }`;
+
+  // ---- pass B: add each delta into the cell the ant stood on ----
+  const VS_WRITE = `#version 300 es
+  precision highp float; precision highp int;
+  uniform sampler2D uState;
+  uniform ivec2 uSize;
+  uniform int uAntTex;
+  flat out int vId;
+  void main() {
+    int id = gl_VertexID;
+    vec4 st = texelFetch(uState, ivec2(id % uAntTex, id / uAntTex), 0);
+    gl_Position = vec4(((st.xy + 0.5) / vec2(uSize)) * 2.0 - 1.0, 0.0, 1.0);
+    gl_PointSize = 1.0;
+    vId = id;
+  }`;
+  const FS_WRITE = `#version 300 es
+  precision highp float; precision highp int; precision highp sampler2DArray;
+  uniform sampler2DArray uDelta;
+  uniform int uAntTex, uG;
+  flat in int vId;
+  layout(location = 0) out vec4 o0;
+  layout(location = 1) out vec4 o1;
+  layout(location = 2) out vec4 o2;
+  layout(location = 3) out vec4 o3;
+  void main() {
+    ivec2 t = ivec2(vId % uAntTex, vId / uAntTex);
+    vec4 d[4] = vec4[4](vec4(0.0), vec4(0.0), vec4(0.0), vec4(0.0));
+    for (int g = 0; g < 4; g++) { if (g >= uG) break; d[g] = texelFetch(uDelta, ivec3(t, g), 0); }
+    o0 = d[0]; o1 = d[1]; o2 = d[2]; o3 = d[3];
+  }`;
+
+  // ---- display ----
+  const FS_VIEW = `#version 300 es
+  precision highp float; precision highp int; precision highp sampler2DArray;
+  uniform sampler2DArray uField;
+  uniform ivec2 uSize;
+  uniform int uC, uG, uMode;
+  uniform float uGain;
+  in vec2 vUv;
+  out vec4 frag;
+
+  vec3 hue2rgb(float hue) {
+    vec3 k = mod(vec3(5.0, 3.0, 1.0) + hue * 6.0, 6.0);
+    return clamp(min(k, 4.0 - k), 0.0, 1.0);
+  }
+  void main() {
+    ivec2 p = ivec2(vUv * vec2(uSize));
+    p = clamp(p, ivec2(0), uSize - 1);
+    p.y = uSize.y - 1 - p.y;
+
+    float ch[16];
+    for (int g = 0; g < 4; g++) {
+      if (g >= uG) break;
+      vec4 v = texelFetch(uField, ivec3(p, g), 0);
+      for (int k = 0; k < 4; k++) { int c = g * 4 + k; if (c >= uC) break; ch[c] = v[k]; }
+    }
+
+    vec3 col;
+    if (uMode == 0) {
+      col = vec3(ch[0], uC > 1 ? ch[1] : ch[0], uC > 2 ? ch[2] : ch[0]) * uGain * 0.5 + 0.5;
+    } else if (uMode == 1) {
+      int best = 0; float bv = -1e9;
+      for (int c = 0; c < 16; c++) { if (c >= uC) break; if (ch[c] > bv) { bv = ch[c]; best = c; } }
+      col = bv <= 0.0 ? vec3(0.0) : hue2rgb(float(best) / float(uC)) * clamp(bv * uGain, 0.0, 1.0);
+    } else {
+      col = vec3(0.0);
+      for (int c = 0; c < 16; c++) { if (c >= uC) break; col += hue2rgb(float(c) / float(uC)) * max(ch[c], 0.0); }
+      col *= uGain;
+    }
+    frag = vec4(clamp(col, 0.0, 1.0), 1.0);
+  }`;
+
+  // ---- spread and fade the chemicals, between one step and the next ----
+  const FS_DIFF = `#version 300 es
+  precision highp float; precision highp int; precision highp sampler2DArray;
+  uniform sampler2DArray uField;
+  uniform ivec2 uSize;
+  uniform int uG;
+  uniform float uDiff, uDecay;
+  const float K[9] = float[9](0.0625, 0.125, 0.0625, 0.125, 0.25, 0.125, 0.0625, 0.125, 0.0625);
+  layout(location = 0) out vec4 o0;
+  layout(location = 1) out vec4 o1;
+  layout(location = 2) out vec4 o2;
+  layout(location = 3) out vec4 o3;
+  void main() {
+    ivec2 p = ivec2(gl_FragCoord.xy);
+    vec4 d[4] = vec4[4](vec4(0.0), vec4(0.0), vec4(0.0), vec4(0.0));
+    for (int g = 0; g < 4; g++) {
+      if (g >= uG) break;
+      vec4 blur = vec4(0.0);
+      for (int j = 0; j < 3; j++) {
+        for (int i = 0; i < 3; i++) {
+          ivec2 q = (p + ivec2(i - 1, j - 1) + uSize) % uSize;
+          blur += K[j * 3 + i] * texelFetch(uField, ivec3(q, g), 0);
+        }
+      }
+      vec4 v = texelFetch(uField, ivec3(p, g), 0);
+      d[g] = mix(v, blur, uDiff) * (1.0 - uDecay);
+    }
+    o0 = d[0]; o1 = d[1]; o2 = d[2]; o3 = d[3];
+  }`;
+
+  const VS_DOTS = `#version 300 es
+  precision highp float; precision highp int;
+  uniform sampler2D uState, uOrigin;
+  uniform ivec2 uSize;
+  uniform int uAntTex;
+  out float vT;
+  void main() {
+    ivec2 at = ivec2(gl_VertexID % uAntTex, gl_VertexID / uAntTex);
+    vec4 st = texelFetch(uState, at, 0);
+    float x = (st.x + 0.5) / float(uSize.x) * 2.0 - 1.0;
+    float y = 1.0 - (st.y + 0.5) / float(uSize.y) * 2.0;
+    gl_Position = vec4(x, y, 0.0, 1.0);
+    gl_PointSize = 1.0;
+    vT = texelFetch(uOrigin, at, 0).w;
+  }`;
+  const FS_DOTS = `#version 300 es
+  precision highp float; precision highp int;
+  in float vT;
+  out vec4 frag;
+  void main() {
+    vec3 k = mod(vec3(5.0, 3.0, 1.0) + vT * 6.0, 6.0);
+    frag = vec4(clamp(min(k, 4.0 - k), 0.0, 1.0), 1.0);
+  }`;
+
+  const pBrain = prog(VS_FULL, FS_BRAIN);
+  const pWrite = prog(VS_WRITE, FS_WRITE);
+  const pView = prog(VS_FULL, FS_VIEW);
+  const pDots = prog(VS_DOTS, FS_DOTS);
+  const pDiff = prog(VS_FULL, FS_DIFF);
+  gl.bindVertexArray(gl.createVertexArray());
+
+  // ---------- state ----------
+  const S = {
+    W: 1024, H: 800, C: 6, N: 3000, spawn: 'point', radius: 0.3, showAnts: false,
+    start: 'blob', startAmp: 1, bias: 0.2, diff: 0.1, decay: 0.01, step: 0.2, ident: 2, identMode: 'blend', twoBrains: true,
+    layers: 2, width: 32, act: 1, init: 'he', scale: 1.2, temp: 1, sample: true,
+    offset: false, facing: false,
+    mode: 1, gain: 1.5, speed: 8, seed: 7, playing: true
+  };
+  let G = 2, antTex = 64, tick = 0;
+  let field = [null, null], cur = 0;
+  let stateA = null, stateB = null, originTex = null, identTex = null, deltaTex = null;
+  let fbBrain = null, fbField = [null, null];
+  let layers = [];
+  // the weights live in one texture for the page's life: the largest brain the
+  // panel allows is about 17k numbers, well inside this
+  const wTexW = 512, W_TEX_H = 32;
+  const wPad = new Float32Array(wTexW * W_TEX_H * 4);
+  let wHalf = 0;
+  let wTex = null;
+
+  function rng(seed) {
+    let a = (seed >>> 0) || 1;
+    return () => { a |= 0; a = a + 0x6d2b79f5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  }
+  function normal(r) {
+    let u = 0, v = 0;
+    while (u === 0) u = r();
+    while (v === 0) v = r();
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+
+  function tex2D(w, h) {
+    const t = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texStorage2D(gl.TEXTURE_2D, 1, gl.RGBA32F, w, h);
+    for (const k of [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER]) gl.texParameteri(gl.TEXTURE_2D, k, gl.NEAREST);
+    for (const k of [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T]) gl.texParameteri(gl.TEXTURE_2D, k, gl.CLAMP_TO_EDGE);
+    return t;
+  }
+  function texArr(w, h, d) {
+    const t = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D_ARRAY, t);
+    gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 1, gl.RGBA32F, w, h, d);
+    for (const k of [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER]) gl.texParameteri(gl.TEXTURE_2D_ARRAY, k, gl.NEAREST);
+    for (const k of [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T]) gl.texParameteri(gl.TEXTURE_2D_ARRAY, k, gl.CLAMP_TO_EDGE);
+    return t;
+  }
+  const drawBufs = n => Array.from({ length: 5 }, (_, i) => i < n ? gl.COLOR_ATTACHMENT0 + i : gl.NONE);
+
+  function buildBrain() {
+    const inDim = 3 * S.C + (S.facing ? 2 : 0) + S.ident + (S.offset ? 2 : 0);
+    const outDim = S.C + 3;
+    const dims = [inDim];
+    for (let i = 0; i < S.layers - 1; i++) dims.push(S.width);
+    dims.push(outDim);
+
+    layers = [];
+    let total = 0;
+    for (let L = 0; L + 1 < dims.length; L++) {
+      const nIn = dims[L], nOut = dims[L + 1];
+      layers.push([nIn, nOut, total, total + nIn * nOut]);
+      total += nIn * nOut + nOut;
+    }
+
+    // One draw of a whole brain. Two are packed into the texture, and every ant
+    // reads its own point on the line between them.
+    const genNet = (seed) => {
+      const r = rng(seed);
+      const flat = new Float32Array(total);
+      for (let L = 0; L + 1 < dims.length; L++) {
+        const nIn = dims[L], nOut = dims[L + 1];
+        const wOff = layers[L][2], bOff = layers[L][3];
+        const n = nIn * nOut;
+        const m = new Float32Array(n);
+        const sd = S.scale / Math.sqrt(nIn);
+        if (S.init === 'gauss') {
+          for (let i = 0; i < n; i++) m[i] = normal(r) * sd;
+        } else if (S.init === 'uniform') {
+          const b = sd * Math.sqrt(3);
+          for (let i = 0; i < n; i++) m[i] = (r() * 2 - 1) * b;
+        } else if (S.init === 'he') {
+          // He/Kaiming: sized so relu keeps the signal alive layer after layer
+          const hs = S.scale * Math.sqrt(2 / nIn);
+          for (let i = 0; i < n; i++) m[i] = normal(r) * hs;
+        } else if (S.init === 'xavier') {
+          // Glorot: balances the spread going in against the spread coming out
+          const b = S.scale * Math.sqrt(6 / (nIn + nOut));
+          for (let i = 0; i < n; i++) m[i] = (r() * 2 - 1) * b;
+        } else if (S.init === 'siren') {
+          // SIREN: a wide first layer feeding narrow ones, built for sin
+          const b = L === 0 ? S.scale * 6 / nIn : S.scale * Math.sqrt(6 / nIn);
+          for (let i = 0; i < n; i++) m[i] = (r() * 2 - 1) * b;
+        } else if (S.init === 'sparse') {
+          const keep = Math.max(1, Math.round(nIn * 0.15));
+          for (let o = 0; o < nOut; o++)
+            for (let k = 0; k < keep; k++)
+              m[o * nIn + ((r() * nIn) | 0)] = normal(r) * S.scale / Math.sqrt(keep);
+        } else { // orthogonal: unit rows, made independent by Gram-Schmidt
+          for (let o = 0; o < nOut; o++) {
+            const row = new Float32Array(nIn);
+            for (let i = 0; i < nIn; i++) row[i] = normal(r);
+            for (let q = 0; q < o && q < nIn; q++) {
+              let dot = 0;
+              for (let i = 0; i < nIn; i++) dot += row[i] * m[q * nIn + i];
+              for (let i = 0; i < nIn; i++) row[i] -= dot * m[q * nIn + i];
+            }
+            let nrm = 0;
+            for (let i = 0; i < nIn; i++) nrm += row[i] * row[i];
+            nrm = Math.sqrt(nrm) || 1;
+            for (let i = 0; i < nIn; i++) m[o * nIn + i] = row[i] / nrm;
+          }
+          for (let i = 0; i < n; i++) m[i] *= S.scale;
+        }
+        flat.set(m, wOff);
+        for (let o = 0; o < nOut; o++) flat[bOff + o] = normal(r) * S.bias;
+      }
+      return flat;
+    };
+
+    if (2 * total > wPad.length) return; // far past any setting the panel allows
+    wHalf = total;
+    wPad.fill(0);
+    wPad.set(genNet(S.seed * 2654435761 + 12345), 0);
+    wPad.set(genNet(S.seed * 40503 + 7717), total);
+    gl.bindTexture(gl.TEXTURE_2D, wTex);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, wTexW, W_TEX_H, gl.RGBA, gl.FLOAT, wPad);
+  }
+
+  function spawn() {
+    const data = new Float32Array(antTex * antTex * 4);
+    const r = rng(S.seed * 97 + 5);
+    const cx = S.W / 2, cy = S.H / 2;
+    const rad = S.radius * Math.min(S.W, S.H);
+    const RING = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+    const toward = (vx, vy) => {
+      let best = 0, bd = -1e9;
+      for (let d = 0; d < 4; d++) { const s = RING[d][0] * vx + RING[d][1] * vy; if (s > bd) { bd = s; best = d; } }
+      return best;
+    };
+    for (let i = 0; i < S.N; i++) {
+      let x, y, h;
+      if (S.spawn === 'point') { x = Math.floor(cx); y = Math.floor(cy); h = (r() * 4) | 0; }
+      else if (S.spawn === 'scatter') { x = (r() * S.W) | 0; y = (r() * S.H) | 0; h = (r() * 4) | 0; }
+      else if (S.spawn === 'row') {
+        x = S.N === 1 ? Math.floor(cx) : Math.round(i * (S.W - 1) / (S.N - 1));
+        y = S.H - 1; h = 0;
+      } else {
+        const a = 2 * Math.PI * (S.N === 1 ? 0 : i / S.N);
+        x = Math.round(cx + Math.cos(a) * rad);
+        y = Math.round(cy + Math.sin(a) * rad);
+        h = S.spawn === 'circle-in' ? toward(-Math.cos(a), -Math.sin(a))
+          : S.spawn === 'circle-out' ? toward(Math.cos(a), Math.sin(a))
+          : (r() * 4) | 0;
+      }
+      x = ((x % S.W) + S.W) % S.W; y = ((y % S.H) + S.H) % S.H;
+      const k = i * 4;
+      data[k] = x; data[k + 1] = y; data[k + 2] = h;
+      data[k + 3] = S.N === 1 ? 0 : i / (S.N - 1); // its point between the two brains
+    }
+    for (const t of [stateA, originTex]) {
+      gl.bindTexture(gl.TEXTURE_2D, t);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, antTex, antTex, gl.RGBA, gl.FLOAT, data);
+    }
+
+    // Either every ant draws its own vector, or two are drawn and the colony is
+    // spread along the line between them, in spawn order.
+    const me = new Float32Array(antTex * antTex * 4);
+    const endA = [0, 1, 2, 3].map(() => normal(r));
+    const endB = [0, 1, 2, 3].map(() => normal(r));
+    for (let i = 0; i < S.N; i++) {
+      const t = S.N === 1 ? 0 : i / (S.N - 1);
+      for (let k = 0; k < 4; k++)
+        me[i * 4 + k] = S.identMode === 'blend' ? endA[k] * (1 - t) + endB[k] * t : normal(r);
+    }
+    gl.bindTexture(gl.TEXTURE_2D, identTex);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, antTex, antTex, gl.RGBA, gl.FLOAT, me);
+    tick = 0;
+  }
+
+  function clearField() {
+    gl.disable(gl.BLEND);
+    gl.viewport(0, 0, S.W, S.H);
+    gl.clearColor(0, 0, 0, 0);
+    for (let i = 0; i < 2; i++) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbField[i]);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+    }
+  }
+
+  // Lay down whatever the field starts as. Zero everywhere is a fixed point for
+  // a bias-free brain, so a pattern here is what gets an unfed ant moving.
+  function seedField() {
+    clearField();
+    if (S.start === 'blank' || S.startAmp === 0) return;
+
+    const r = rng(S.seed * 31 + 11);
+    const data = new Float32Array(S.W * S.H * G * 4);
+    const cx = (S.W / 2) | 0, cy = (S.H / 2) | 0;
+    const rad = Math.max(1, S.radius * Math.min(S.W, S.H));
+    const put = (x, y, amp) => {
+      if (x < 0 || y < 0 || x >= S.W || y >= S.H || amp === 0) return;
+      for (let c = 0; c < S.C; c++) {
+        const g = c >> 2, k = c & 3;
+        data[(((g * S.H + y) * S.W + x) << 2) + k] = (r() * 2 - 1) * amp;
+      }
+    };
+
+    if (S.start === 'dot') {
+      put(cx, cy, S.startAmp);
+    } else if (S.start === 'ring') {
+      const n = Math.ceil(2 * Math.PI * rad * 2);
+      for (let i = 0; i < n; i++) {
+        const a = 2 * Math.PI * i / n;
+        put(Math.round(cx + Math.cos(a) * rad), Math.round(cy + Math.sin(a) * rad), S.startAmp);
+      }
+    } else if (S.start === 'disc') {
+      for (let y = Math.max(0, cy - rad | 0); y < Math.min(S.H, cy + rad + 1); y++)
+        for (let x = Math.max(0, cx - rad | 0); x < Math.min(S.W, cx + rad + 1); x++)
+          if ((x - cx) ** 2 + (y - cy) ** 2 <= rad * rad) put(x, y, S.startAmp);
+    } else if (S.start === 'blob') {
+      const s2 = 2 * (rad / 2) ** 2;
+      for (let y = 0; y < S.H; y++)
+        for (let x = 0; x < S.W; x++) {
+          const d2 = (x - cx) ** 2 + (y - cy) ** 2;
+          if (d2 < s2 * 9) put(x, y, S.startAmp * Math.exp(-d2 / s2));
+        }
+    } else { // whole field
+      for (let y = 0; y < S.H; y++) for (let x = 0; x < S.W; x++) put(x, y, S.startAmp);
+    }
+
+    gl.bindTexture(gl.TEXTURE_2D_ARRAY, field[cur]);
+    gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, S.W, S.H, G, gl.RGBA, gl.FLOAT, data);
+  }
+
+  function allocate() {
+    G = Math.ceil(S.C / 4);
+    antTex = Math.max(1, Math.ceil(Math.sqrt(S.N)));
+    for (const t of [stateA, stateB, originTex, identTex, deltaTex, ...field]) if (t) gl.deleteTexture(t);
+    for (const f of [fbBrain, ...fbField]) if (f) gl.deleteFramebuffer(f);
+
+    deltaTex = texArr(antTex, antTex, G);
+    stateA = tex2D(antTex, antTex);
+    stateB = tex2D(antTex, antTex);
+    originTex = tex2D(antTex, antTex);
+    identTex = tex2D(antTex, antTex);
+
+    fbBrain = gl.createFramebuffer();
+    cur = 0;
+    for (let i = 0; i < 2; i++) {
+      field[i] = texArr(S.W, S.H, G);
+      fbField[i] = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbField[i]);
+      for (let g = 0; g < G; g++)
+        gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + g, field[i], 0, g);
+      gl.drawBuffers(drawBufs(G));
+    }
+
+    canvas.width = S.W; canvas.height = S.H;
+    if (!wTex) wTex = tex2D(wTexW, W_TEX_H);
+    buildBrain();
+    spawn();
+    seedField();
+  }
+
+  function bindBrainTargets() {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbBrain);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, stateB, 0);
+    for (let g = 0; g < G; g++)
+      gl.framebufferTextureLayer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1 + g, deltaTex, 0, g);
+    gl.drawBuffers(drawBufs(G + 1));
+  }
+
+  function simStep() {
+    // 1. every ant senses, thinks, and decides where to go
+    bindBrainTargets();
+    gl.disable(gl.BLEND);
+    gl.viewport(0, 0, antTex, antTex);
+    gl.useProgram(pBrain.p);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D_ARRAY, field[cur]);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, stateA);
+    gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, originTex);
+    gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, wTex);
+    gl.activeTexture(gl.TEXTURE4); gl.bindTexture(gl.TEXTURE_2D, identTex);
+    gl.uniform1i(pBrain.u.uField, 0); gl.uniform1i(pBrain.u.uState, 1);
+    gl.uniform1i(pBrain.u.uOrigin, 2); gl.uniform1i(pBrain.u.uW, 3);
+    gl.uniform1i(pBrain.u.uIdent, 4); gl.uniform1i(pBrain.u.uIdN, S.ident);
+    gl.uniform1i(pBrain.u.uWHalf, wHalf); gl.uniform1i(pBrain.u.uBlend, S.twoBrains ? 1 : 0);
+    gl.uniform2i(pBrain.u.uSize, S.W, S.H);
+    gl.uniform1i(pBrain.u.uC, S.C); gl.uniform1i(pBrain.u.uG, G);
+    gl.uniform1i(pBrain.u.uLayers, layers.length);
+    gl.uniform4iv(pBrain.u.uLayer, new Int32Array(layers.flat()));
+    gl.uniform1i(pBrain.u.uAct, S.act);
+    gl.uniform1i(pBrain.u.uOffset, S.offset ? 1 : 0);
+    gl.uniform1i(pBrain.u.uFacing, S.facing ? 1 : 0);
+    gl.uniform1f(pBrain.u.uStep, S.step);
+    gl.uniform1i(pBrain.u.uSample, S.sample ? 1 : 0);
+    gl.uniform1i(pBrain.u.uAntTex, antTex);
+    gl.uniform1i(pBrain.u.uWTexW, wTexW);
+    gl.uniform1f(pBrain.u.uTemp, S.temp);
+    gl.uniform1ui(pBrain.u.uTick, tick >>> 0);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    // 2. each delta is added into the cell the ant was standing on
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbField[cur]);
+    gl.viewport(0, 0, S.W, S.H);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ONE);
+    gl.useProgram(pWrite.p);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, stateA);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D_ARRAY, deltaTex);
+    gl.uniform1i(pWrite.u.uState, 0); gl.uniform1i(pWrite.u.uDelta, 1);
+    gl.uniform2i(pWrite.u.uSize, S.W, S.H);
+    gl.uniform1i(pWrite.u.uAntTex, antTex);
+    gl.uniform1i(pWrite.u.uG, G);
+    gl.drawArrays(gl.POINTS, 0, S.N);
+    gl.disable(gl.BLEND);
+
+    // 3. the chemicals spread a little and fade a little
+    if (S.diff > 0 || S.decay > 0) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbField[1 - cur]);
+      gl.useProgram(pDiff.p);
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D_ARRAY, field[cur]);
+      gl.uniform1i(pDiff.u.uField, 0);
+      gl.uniform2i(pDiff.u.uSize, S.W, S.H);
+      gl.uniform1i(pDiff.u.uG, G);
+      gl.uniform1f(pDiff.u.uDiff, S.diff);
+      gl.uniform1f(pDiff.u.uDecay, S.decay);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      cur = 1 - cur;
+    }
+
+    const t = stateA; stateA = stateB; stateB = t;
+    tick++;
+  }
+
+  function draw() {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, S.W, S.H);
+    gl.useProgram(pView.p);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D_ARRAY, field[cur]);
+    gl.uniform1i(pView.u.uField, 0);
+    gl.uniform2i(pView.u.uSize, S.W, S.H);
+    gl.uniform1i(pView.u.uC, S.C); gl.uniform1i(pView.u.uG, G);
+    gl.uniform1i(pView.u.uMode, S.mode);
+    gl.uniform1f(pView.u.uGain, S.gain);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    if (S.showAnts) {
+      gl.useProgram(pDots.p);
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, stateA);
+      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, originTex);
+      gl.uniform1i(pDots.u.uState, 0);
+      gl.uniform1i(pDots.u.uOrigin, 1);
+      gl.uniform2i(pDots.u.uSize, S.W, S.H);
+      gl.uniform1i(pDots.u.uAntTex, antTex);
+      gl.drawArrays(gl.POINTS, 0, S.N);
+    }
+  }
+
+  // ---------- presets ----------
+  // Found by scoring ~700 random and mutated configurations on how much
+  // structure, contrast and colour they produced after 300 steps.
+  const PRESETS = [
+    {"name":"Lichen","cfg":{"W":128,"H":128,"C":8,"N":6603,"spawn":"point","radius":0.1513,"ident":1,"identMode":"random","twoBrains":false,"layers":4,"width":28,"act":3,"init":"ortho","scale":2.378,"bias":0.6322,"step":0.8233,"temp":0.951,"sample":true,"facing":false,"offset":false,"start":"disc","startAmp":0.6905,"diff":0.0929,"decay":0.018,"seed":7}},
+    {"name":"Frostbloom","cfg":{"W":128,"H":128,"C":8,"N":1474,"spawn":"point","radius":0.196,"ident":0,"identMode":"blend","twoBrains":true,"layers":2,"width":60,"act":3,"init":"he","scale":0.7712,"bias":0.7938,"step":0.571,"temp":1.5809,"sample":true,"facing":false,"offset":false,"start":"blank","startAmp":5,"diff":0.024,"decay":0.0227,"seed":7}},
+    {"name":"Continents","cfg":{"W":128,"H":128,"C":4,"N":1975,"spawn":"circle-out","radius":0.2871,"ident":4,"identMode":"random","twoBrains":true,"layers":3,"width":60,"act":3,"init":"xavier","scale":2.6,"bias":1.1323,"step":1.148,"temp":0.7799,"sample":true,"facing":false,"offset":false,"start":"dot","startAmp":2.3616,"diff":0.45,"decay":0.028,"seed":7}},
+    {"name":"Tideline","cfg":{"W":128,"H":128,"C":5,"N":495,"spawn":"row","radius":0.2754,"ident":0,"identMode":"blend","twoBrains":true,"layers":2,"width":24,"act":0,"init":"uniform","scale":0.689,"bias":0.985,"step":1.055,"temp":0.6977,"sample":true,"facing":false,"offset":false,"start":"blob","startAmp":4.14,"diff":0.0794,"decay":0.0389,"seed":7}},
+    {"name":"Nebula","cfg":{"W":128,"H":128,"C":4,"N":5816,"spawn":"circle-rand","radius":0.225,"ident":4,"identMode":"blend","twoBrains":true,"layers":4,"width":24,"act":4,"init":"gauss","scale":1.174,"bias":1.074,"step":0.081,"temp":1.624,"sample":true,"facing":false,"offset":true,"start":"noise","startAmp":0.82,"diff":0.141,"decay":0.004,"seed":7}},
+    {"name":"Reedbed","cfg":{"W":128,"H":128,"C":12,"N":1162,"spawn":"row","radius":0.216,"ident":0,"identMode":"blend","twoBrains":true,"layers":2,"width":12,"act":3,"init":"siren","scale":1.022,"bias":1.168,"step":0.663,"temp":1.27,"sample":true,"facing":false,"offset":true,"start":"ring","startAmp":3.64,"diff":0.024,"decay":0.0274,"seed":7}},
+    {"name":"Plates","cfg":{"W":128,"H":128,"C":4,"N":3458,"spawn":"circle-in","radius":0.126,"ident":3,"identMode":"blend","twoBrains":false,"layers":3,"width":64,"act":4,"init":"siren","scale":1.681,"bias":0.606,"step":0.825,"temp":2.135,"sample":true,"facing":false,"offset":false,"start":"dot","startAmp":2.07,"diff":0.213,"decay":0.0309,"seed":7}},
+    {"name":"Spore","cfg":{"W":128,"H":128,"C":6,"N":922,"spawn":"point","radius":0.196,"ident":0,"identMode":"blend","twoBrains":true,"layers":3,"width":60,"act":1,"init":"he","scale":0.739,"bias":1.072,"step":0.571,"temp":1.5742,"sample":true,"facing":false,"offset":false,"start":"blank","startAmp":2.907,"diff":0.0435,"decay":0.0498,"seed":7}}
+  ];
+
+  const UI = {
+    cW:['W'], cH:['H'], cC:['C'], cDiff:['diff',2], cDecay:['decay',3],
+    cStartAmp:['startAmp',1], cN:['N'], cRad:['radius',2], cIdent:['ident'],
+    cL:['layers'], cWid:['width'], cScale:['scale',2], cBias:['bias',2],
+    cStep:['step',2], cTemp:['temp',2], cGain:['gain',1], cSpeed:['speed'],
+  };
+  const UI_SELECT = { cStart:'start', cSpawn:'spawn', cIdentMode:'identMode',
+                      cAct:'act', cInit:'init', cMode:'mode' };
+  const UI_CHECK = { cShow:'showAnts', cSample:'sample', cTwo:'twoBrains',
+                     cFace:'facing', cOff:'offset' };
+
+  function syncUI() {
+    for (const [id, [key, digits]] of Object.entries(UI)) {
+      const el = document.getElementById(id);
+      el.value = S[key];
+      const v = document.getElementById('v' + id.slice(1));
+      if (v) v.textContent = digits === undefined ? S[key] : Number(S[key]).toFixed(digits);
+    }
+    for (const [id, key] of Object.entries(UI_SELECT)) document.getElementById(id).value = S[key];
+    for (const [id, key] of Object.entries(UI_CHECK)) document.getElementById(id).checked = S[key];
+    document.getElementById('cSeed').value = S.seed;
+  }
+
+  // ---------- controls ----------
+  const $ = id => document.getElementById(id);
+  const fmt = (v, d) => Number(v).toFixed(d);
+
+  // `live` controls apply while dragging; the rest wait for the release, so a
+  // sweep of the width slider does not reallocate the field at every step
+  function bind(id, valId, key, digits, after, live = true) {
+    const el = $(id);
+    const show = () => { if (valId) $(valId).textContent = digits === undefined ? el.value : fmt(el.value, digits); };
+    el.addEventListener('input', () => { S[key] = Number(el.value); show(); if (live && after) after(); });
+    if (!live && after) el.addEventListener('change', after);
+    show();
+  }
+  const restart = () => { spawn(); seedField(); };
+
+  $('cC').max = MAX_C;
+  if (S.C > MAX_C) S.C = MAX_C;
+  $('cC').value = S.C; $('vC').textContent = S.C;
+
+  bind('cW', 'vW', 'W', undefined, allocate, false);
+  bind('cH', 'vH', 'H', undefined, allocate, false);
+  bind('cC', 'vC', 'C', undefined, allocate, false);
+  bind('cN', 'vN', 'N', undefined, allocate, false);
+  bind('cRad', 'vRad', 'radius', 2, restart, false);
+  bind('cL', 'vL', 'layers', undefined, buildBrain, false);
+  bind('cWid', 'vWid', 'width', undefined, buildBrain, false);
+  bind('cScale', 'vScale', 'scale', 2, buildBrain);
+  bind('cBias', 'vBias', 'bias', 2, buildBrain);
+  bind('cStep', 'vStep', 'step', 2);
+  bind('cIdent', 'vIdent', 'ident', undefined, buildBrain, false);
+  bind('cDiff', 'vDiff', 'diff', 2);
+  bind('cDecay', 'vDecay', 'decay', 3);
+  bind('cStartAmp', 'vStartAmp', 'startAmp', 1, restart, false);
+  bind('cTemp', 'vTemp', 'temp', 2);
+  bind('cGain', 'vGain', 'gain', 1);
+  bind('cSpeed', 'vSpeed', 'speed');
+
+  $('cIdentMode').addEventListener('change', e => { S.identMode = e.target.value; restart(); });
+  $('cPreset').addEventListener('change', e => {
+    const p = PRESETS[e.target.value];
+    if (!p) return;
+    Object.assign(S, p.cfg);
+    syncUI();
+    allocate();
+  });
+  $('cStart').addEventListener('change', e => { S.start = e.target.value; restart(); });
+  $('cSpawn').addEventListener('change', e => { S.spawn = e.target.value; restart(); });
+  $('cAct').addEventListener('change', e => { S.act = Number(e.target.value); });
+  $('cInit').addEventListener('change', e => { S.init = e.target.value; buildBrain(); });
+  $('cMode').addEventListener('change', e => { S.mode = Number(e.target.value); });
+  $('cShow').addEventListener('change', e => { S.showAnts = e.target.checked; });
+  $('cSample').addEventListener('change', e => { S.sample = e.target.checked; });
+  $('cOff').addEventListener('change', e => { S.offset = e.target.checked; buildBrain(); });
+  $('cTwo').addEventListener('change', e => { S.twoBrains = e.target.checked; });
+  $('cFace').addEventListener('change', e => { S.facing = e.target.checked; buildBrain(); });
+  const newSeed = () => {
+    S.seed = (Math.random() * 1e6) | 0;
+    $('cSeed').value = S.seed;
+    buildBrain(); restart();
+  };
+  $('cSeed').addEventListener('change', e => { S.seed = Number(e.target.value) || 0; buildBrain(); restart(); });
+
+  $('play').addEventListener('click', () => {
+    S.playing = !S.playing;
+    $('play').textContent = S.playing ? 'Pause' : 'Play';
+  });
+  $('step1').addEventListener('click', () => { S.playing = false; $('play').textContent = 'Play'; simStep(); draw(); });
+  $('reset').addEventListener('click', restart);
+  $('reroll').addEventListener('click', newSeed);
+  $('dice').addEventListener('click', newSeed);
+
+  // ---------- loop ----------
+  allocate();
+  let last = performance.now(), frames = 0, fpsAt = last;
+  function frame(now) {
+    if (S.playing) for (let i = 0; i < S.speed; i++) simStep();
+    draw();
+    frames++;
+    if (now - fpsAt > 500) {
+      $('rFps').textContent = Math.round(frames * 1000 / (now - fpsAt));
+      frames = 0; fpsAt = now;
+    }
+    $('rStep').textContent = tick;
+    $('rAnts').textContent = S.N;
+    $('rGrid').textContent = S.W + '×' + S.H;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>

@@ -141,6 +141,44 @@ h1 {
 .credit a:hover { color: #fff; }
 .credit .era { font-size: 11.5px; color: rgba(252, 222, 185, 0.62); }
 
+/* ---- the lede, with the lab beside it ---------------------------------- */
+
+.lede-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.lede-row .lede { margin-bottom: 0; max-width: 30em; }
+
+/* the one card that leaves the page: sand, with the same hard shadow as the buttons */
+.labcard {
+  flex: 0 0 auto;
+  max-width: 268px;
+  padding: 12px 14px;
+  background: var(--sand);
+  border: 1px solid var(--sand-deep);
+  border-radius: 5px;
+  box-shadow: 3px 3px 0 var(--sand-deep);
+  text-decoration: none;
+  color: var(--deep);
+  transition: background 90ms linear, color 90ms linear, box-shadow 90ms linear;
+}
+.labcard b {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+}
+.labcard span { display: block; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+.labcard:hover { background: var(--red); color: #fff; box-shadow: 3px 3px 0 var(--deep); }
+.labcard:hover span { color: rgba(255, 255, 255, 0.85); }
+.labcard:active { transform: translate(1px, 1px); box-shadow: 2px 2px 0 var(--deep); }
+@media (max-width: 760px) { .labcard { max-width: none; } }
+
 .lede {
   max-width: 34em;
   margin-bottom: 28px;
