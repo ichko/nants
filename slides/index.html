@@ -11,6 +11,7 @@ html,body{margin:0;height:100%;background:#241d19;overflow:hidden;font-family:'I
 #stage section{position:absolute;left:0;top:0;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden}
 #stage h1,#stage h2,#stage h3,#stage p,#stage ul,#stage ol{margin:0}
 #stage ul,#stage ol{padding-left:40px}
+#stage section > :not(iframe){position:relative}  /* flow children paint over a pinned full-bleed embed, as in the deck */
 #stage aside{display:none}
 #stage img{display:block}
 #stage a{cursor:pointer}
