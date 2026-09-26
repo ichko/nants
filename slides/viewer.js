@@ -13,11 +13,22 @@
   await Promise.all(order.map(async id => { html[id] = await (await fetch('project/slides/' + id + '.html')).text(); }));
 
   let at = 0, step = 0, section = null, steps = 0;
+  // The slides are 16:9. On a screen that is only a little taller, a MacBook's
+  // 16:10 say, the slide is scaled to fill it and a sliver of the 128px margins
+  // goes off each side; on anything further from 16:9 it is fitted whole, with
+  // the bands painted in the slide's own background so they read as part of it.
   function fit() {
-    const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    const fitS = Math.min(innerWidth / 1920, innerHeight / 1080);
+    const coverS = Math.max(innerWidth / 1920, innerHeight / 1080);
+    const cut = Math.max((1920 * coverS - innerWidth) / (1920 * coverS), (1080 * coverS - innerHeight) / (1080 * coverS));
+    const s = cut <= 0.06 ? coverS : fitS;
     stage.style.transform = 'scale(' + s + ')';
     stage.style.left = Math.round((innerWidth - 1920 * s) / 2) + 'px';
     stage.style.top = Math.round((innerHeight - 1080 * s) / 2) + 'px';
+  }
+  function tint() {
+    const bg = section && (section.style.background || section.style.backgroundColor);
+    document.body.style.background = bg || '#241d19';
   }
   function buildOf(el) { const m = /(\d+)/.exec(el.getAttribute('data-build-in') || ''); return m ? +m[1] : 0; }
   function embed(x) {
@@ -37,6 +48,7 @@
     section.querySelectorAll('x-embed').forEach(x => { if (!x.hasAttribute('data-build-in')) embed(x); });
     reveal();
     section.querySelectorAll('a[href]').forEach(a => { a.target = '_blank'; a.rel = 'noopener'; a.addEventListener('click', e => e.stopPropagation()); });
+    tint();
     location.replace('#' + (at + 1) + (step ? '.' + step : ''));
     pos.textContent = (at + 1) + ' / ' + order.length;
   }
