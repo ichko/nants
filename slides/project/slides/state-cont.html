@@ -1,0 +1,154 @@
+<section id="state-cont" data-transition="fade" style="background:#fbf7f0; color:#241d19; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px">
+  <h2 style="position:absolute; left:128px; top:150px; width:700px; font-size:80px; font-weight:600; line-height:1.1">Taking care of<br>the state</h2>
+
+  <p data-build-in="rise 1" style="position:absolute; left:128px; top:372px; width:340px; font-size:38px; color:#7b6f66"><b style="color:#241d19">Discrete</b> state</p>
+  <p data-build-in="rise 2" style="position:absolute; left:384px; top:372px; width:460px; font-size:38px; color:#7b6f66">&#8594; <b style="color:#b00300">continuous</b></p>
+  <p data-build-in="rise 1" style="position:absolute; left:128px; top:434px; width:240px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:30px; color:#241d19">{0, 1}</p>
+
+  <x-embed data-build-in="fade 2" style="position:absolute; left:426px; top:426px; width:320px; height:60px"><style>
+html,body{margin:0;height:100%;background:#fbf7f0;overflow:hidden}
+#c{display:block}
+</style><canvas id="c" width="320" height="60"></canvas><script>
+var g=document.getElementById('c').getContext('2d'),t0=0;
+function draw(now){
+ var u=0.5-0.5*Math.cos((now-t0)/1000*1.4);         // glides 0 to 1 and back
+ g.clearRect(0,0,320,60);
+ g.font='500 24px ui-monospace,Menlo,Consolas,monospace';g.fillStyle='#7b6f66';g.textBaseline='middle';
+ g.textAlign='left';g.fillText('0',0,30);g.textAlign='right';g.fillText('1',320,30);
+ var x0=34,x1=286,x=x0+(x1-x0)*u;
+ g.strokeStyle='#e8dccb';g.lineWidth=4;g.lineCap='round';g.beginPath();g.moveTo(x0,30);g.lineTo(x1,30);g.stroke();
+ g.strokeStyle='#b00300';g.beginPath();g.moveTo(x0,30);g.lineTo(x,30);g.stroke();
+ g.fillStyle='#b00300';g.beginPath();g.arc(x,30,9,0,6.283);g.fill();
+ requestAnimationFrame(draw);}
+function start(){t0=performance.now();requestAnimationFrame(draw);}
+(function(){var d=false;function go(){if(d)return;d=true;start();}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf('paint')<0)throw 0;
+  var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});
+  po.observe({type:'paint',buffered:true});}catch(_){go();}})();
+</script></x-embed>
+
+  <x-embed data-build-in="fade 1" style="position:absolute; left:952px; top:176px; width:840px; height:764px"><style>
+html,body{margin:0;height:100%;background:#fbf7f0;overflow:hidden;font-family:ui-monospace,Menlo,Consolas,monospace;color:#7b6f66}
+#c{display:block}#p{text-align:center;font-size:26px;padding-top:8px}
+</style><canvas id="c" width="840" height="712"></canvas><div id="p">0 or 1</div><script>
+var g=document.getElementById('c').getContext('2d'),N=8,CS=86,X0=76,Y0=12,IN=0;   // 11 by 11, padded squares
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+var R=rng(1234),s=new Uint8Array(N*N),ROUNDS=8,EVERY=300;   // empty board; same seed as the next stage
+// a soft-cornered polygon: each corner cut back by r along both edges and bridged with a curve
+function rpoly(P,r){var n=P.length;g.beginPath();
+ for(var i=0;i<n;i++){var c=P[i],a=P[(i+n-1)%n],b=P[(i+1)%n];
+  var ax=a[0]-c[0],ay=a[1]-c[1],bx=b[0]-c[0],by=b[1]-c[1],la=Math.hypot(ax,ay),lb=Math.hypot(bx,by);
+  var rr=Math.min(r,la*0.4,lb*0.4);
+  var p1=[c[0]+ax/la*rr,c[1]+ay/la*rr],p2=[c[0]+bx/lb*rr,c[1]+by/lb*rr];
+  if(i===0)g.moveTo(p1[0],p1[1]);else g.lineTo(p1[0],p1[1]);
+  g.quadraticCurveTo(c[0],c[1],p2[0],p2[1]);}
+ g.closePath();}
+function rrect(x,y,w,h,r){rpoly([[x,y],[x+w,y],[x+w,y+h],[x,y+h]],r);}
+var SH='#a89b88',VMAX=0.85;
+function board(){g.fillStyle='#FFFFFF';g.fillRect(X0,Y0,N*CS,N*CS);}   // flat and plain, no shadow
+function cell(k){var i=k%N,j=(k/N)|0,x=X0+i*CS+IN,y=Y0+j*CS+IN,w=CS-2*IN;
+ rrect(x+.5,y+.5,w-1,w-1,0);
+ g.fillStyle='#FFFFFF';g.fill();
+ if(s[k]){g.fillStyle='rgba(196,64,52,'+VMAX+')';g.fill();}
+ g.strokeStyle='#e8dccb';g.lineWidth=1;g.stroke();}
+board();for(var k0=0;k0<N*N;k0++)cell(k0);
+var last=0,round=0;
+function tell(){try{for(var i=0;i<parent.frames.length;i++)parent.frames[i].postMessage({nantsFlicks:round},'*');}catch(_){}}
+setInterval(tell,300);                              // the next stage listens, so it can start from this exact board
+function frame(now){                                // one cell flips outright every 200ms, then it holds
+ if(now-last>EVERY){last=now;var k=(R()*N*N)|0;s[k]^=1;cell(k);round++;tell();}
+ if(round<ROUNDS)requestAnimationFrame(frame);}
+function start(){setTimeout(function(){requestAnimationFrame(frame);},500);}   // the empty grid first, half a second
+(function(){var d=false;function go(){if(d)return;d=true;start();}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf('paint')<0)throw 0;
+  var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});
+  po.observe({type:'paint',buffered:true});}catch(_){go();}})();
+</script></x-embed>
+
+  <x-embed data-build-in="fade 2" style="position:absolute; left:952px; top:176px; width:840px; height:764px"><style>
+html,body{margin:0;height:100%;background:#fbf7f0;overflow:hidden;font-family:ui-monospace,Menlo,Consolas,monospace;color:#7b6f66}
+#c{display:block}#p{text-align:center;font-size:26px;padding-top:8px}
+</style><canvas id="c" width="840" height="712"></canvas><div id="p">any number, in multiple channels</div><script>
+var g=document.getElementById('c').getContext('2d'),N=8,CS=86,X0=76,Y0=12,IN=0;   // the very same grid
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+var L=3,W2=45.4,H2=22.7,LH=78,CX=420,CY=88;           // three sheets, and dots to say there could be more
+var COL=[[196,64,52],[74,140,92],[66,110,170],[123,111,102]],SH='#a89b88',VMAX=0.85;   // a red, a green, a blue, and the hint
+var Rf=rng(1234),R=[rng(4321),rng(77),rng(9001)],at=[],amp=[],mode=[],fr=[],PD=1.4;   // Rf replays the 0/1 stage's flicks, nothing else touches it
+for(var l=0;l<3;l++){at.push(new Float32Array(N*N));amp.push(new Float32Array(N*N));mode.push(new Uint8Array(N*N));fr.push(new Float32Array(N*N));}
+function pulse(u){if(u<0||u>1)return 0;if(u<0.4){var w=u/0.4;return w*w*(3-2*w);}var z=(u-0.4)/0.6;return 1-z*z*(3-2*z);}
+var bin=new Uint8Array(N*N),got=0,applied=0,started=false;
+window.addEventListener('message',function(e){var d=e.data;   // the 0/1 stage says how far it got
+ if(d&&typeof d.nantsFlicks==='number'&&d.nantsFlicks>got){got=d.nantsFlicks;if(started)sync();}});
+function sync(){while(applied<got){var k=(Rf()*N*N)|0;bin[k]^=1;applied++;setup(0,k);}}
+// Two kinds of cell. One that is on stays on and breathes, up and down, never
+// leaving. One that is off stays white, and now and then pulses up and back.
+function setup(l,k){
+ fr[l][k]=1.6+R[l]()*1.6;
+ var on=l===0?bin[k]:R[l]()<0.1;
+ if(on){mode[l][k]=1;amp[l][k]=l===0?1:0.6+0.4*R[l]();}
+ else{mode[l][k]=0;at[l][k]=(l===0?0.3:0)+R[l]()*3;amp[l][k]=0.7+0.3*R[l]();}}
+for(var l=0;l<3;l++)for(var k=0;k<N*N;k++)setup(l,k);
+var t0=0;
+function P(i,j,l,t){                                 // a point of the grid, part way from flat to isometric
+ var fx=X0+i*CS,fy=Y0+j*CS,ix=CX+(i-j)*W2,iy=CY+(i+j)*H2+l*LH;
+ return[fx+(ix-fx)*t,fy+(iy-fy)*t];}
+// a soft-cornered polygon: each corner cut back by r along both edges and bridged with a curve
+function rpoly(P,r){var n=P.length;g.beginPath();
+ for(var i=0;i<n;i++){var c=P[i],a=P[(i+n-1)%n],b=P[(i+1)%n];
+  var ax=a[0]-c[0],ay=a[1]-c[1],bx=b[0]-c[0],by=b[1]-c[1],la=Math.hypot(ax,ay),lb=Math.hypot(bx,by);
+  var rr=Math.min(r,la*0.4,lb*0.4);
+  var p1=[c[0]+ax/la*rr,c[1]+ay/la*rr],p2=[c[0]+bx/lb*rr,c[1]+by/lb*rr];
+  if(i===0)g.moveTo(p1[0],p1[1]);else g.lineTo(p1[0],p1[1]);
+  g.quadraticCurveTo(c[0],c[1],p2[0],p2[1]);}
+ g.closePath();}
+function rrect(x,y,w,h,r){rpoly([[x,y],[x+w,y],[x+w,y+h],[x,y+h]],r);}
+function poly(a,b,c,d,r){rpoly([a,b,c,d],r);}
+function ease(u){return u<0?0:u>1?1:u*u*(3-2*u);}
+function draw(now){
+ var el=now-t0,es=el/1000;
+ var t=ease((el-1600)/1000);                         // flat while it wakes up, then tilts in one second
+ g.clearRect(0,0,840,712);
+ var ins=IN/CS;                                      // the same padding as the 0/1 board, always
+ for(var l=L-1;l>=0;l--){                            // back to front: lowest sheet first
+  var a=l===0?1:ease((el-2700-(l-1)*500)/400);       // the layers appear beneath, one by one
+  if(a<=0)continue;
+  var c=COL[l],ghost=false;
+  if(ghost)a*=0.9;
+  var e=IN/CS,bw=N*CS+2*IN;
+  if(t>0){var q=[P(0,0,l,t),P(N,0,l,t),P(N,N,l,t),P(0,N,l,t)];   // the sheet, with a sharp shadow under it
+   g.globalAlpha=a;rpoly(q,0);g.shadowColor='rgba(36,29,25,'+(0.35*t)+')';g.shadowBlur=14*t;g.shadowOffsetY=10*t;g.fillStyle='#FFFFFF';g.fill();g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetY=0;g.globalAlpha=1;}   // a soft shadow, straight down, growing with the tilt
+  else if(l===0){g.fillStyle='#FFFFFF';g.fillRect(X0,Y0,N*CS,N*CS);}   // flat: the very same board as the 0/1 stage, no shadow
+  for(var j=0;j<N;j++)for(var i=0;i<N;i++){
+   var k=j*N+i,v=0;
+   if(ghost){}                                                          // the hint sheet holds no values
+   else if(mode[l][k]){v=amp[l][k]*(0.7+0.3*Math.sin(fr[l][k]*es+1.5708));}   // breathing, from 1 downward first
+   else{var u=(es-at[l][k])/PD;
+    if(u>1){at[l][k]=es+1+R[l]()*4;amp[l][k]=0.7+0.3*R[l]();u=-1;}   // rest a while, then again
+    v=amp[l][k]*pulse(u);}
+   if(t===0){                                       // still flat: the very same pixels as the 0/1 stage
+    var x=X0+i*CS+IN,y=Y0+j*CS+IN,w=CS-2*IN;
+    rrect(x+.5,y+.5,w-1,w-1,0);
+    g.fillStyle='#FFFFFF';g.fill();
+    if(v>0.01){g.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(v*VMAX)+')';g.fill();}
+    g.strokeStyle='#e8dccb';g.lineWidth=1;g.stroke();
+    continue;}
+   poly(P(i+ins,j+ins,l,t),P(i+1-ins,j+ins,l,t),P(i+1-ins,j+1-ins,l,t),P(i+ins,j+1-ins,l,t),0);
+   g.fillStyle='rgba(255,255,255,'+a+')';g.fill();                       // white squares on every sheet
+   if(v>0.01){g.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(v*a*VMAX)+')';g.fill();}
+   g.globalAlpha=a;g.strokeStyle=ghost?'#c9b394':'#e8dccb';g.lineWidth=1;g.stroke();g.globalAlpha=1;   // the rules must show on the cream too
+  }
+  if(ghost){}
+ }
+ var lg=L-1,ag=ease((el-2700-lg*500)/400)*0.3;   // the dots come in after the last sheet
+ if(ag>0){g.fillStyle='rgba(123,111,102,'+(ag*2.5)+')';g.font='700 30px ui-monospace,Menlo,Consolas,monospace';
+  g.textAlign='center';g.textBaseline='middle';g.fillText('⋮',CX,CY+(2*N)*H2+lg*LH+26);}   // and so on
+ requestAnimationFrame(draw);}
+function start(){if(got===0)got=8;sync();started=true;t0=performance.now();requestAnimationFrame(draw);}
+(function(){var d=false;function go(){if(d)return;d=true;start();}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf('paint')<0)throw 0;
+  var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});
+  po.observe({type:'paint',buffered:true});}catch(_){go();}})();
+</script></x-embed>
+
+  <aside>Two clicks. First the board as Langton had it: cells flip to 1 or back to 0, one at a time, outright. Then the same board, the same flicker, but each cell sets off from the 0 or 1 it had and keeps rising and falling on its own; the board tilts into a stack, and more sheets appear beneath, each its own channel. That stack is what our ants read and write.</aside>
+</section>

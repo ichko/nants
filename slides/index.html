@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Langton's ant with a neural network · slides</title>
+<link rel="icon" href="../favicon.svg">
+<style>
+html,body{margin:0;height:100%;background:#241d19;overflow:hidden;font-family:'IBM Plex Sans',Arial,sans-serif}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;background:#fbf7f0;overflow:hidden}
+#stage section{position:absolute;left:0;top:0;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden}
+#stage h1,#stage h2,#stage h3,#stage p,#stage ul,#stage ol{margin:0}
+#stage ul,#stage ol{padding-left:40px}
+#stage aside{display:none}
+#stage img{display:block}
+#stage a{cursor:pointer}
+#stage iframe{position:absolute;border:0;pointer-events:none;background:transparent}
+#stage [data-build-in]{visibility:hidden}
+#stage [data-build-in].on{visibility:visible;animation:fadein .45s ease}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+#hud{position:fixed;right:14px;bottom:10px;font:12px 'JetBrains Mono',ui-monospace,Menlo,monospace;color:#fcdeb9;opacity:.65;user-select:none}
+#hud a{color:#fcdeb9;text-decoration:none;margin-right:14px}
+#hud a:hover{color:#fff}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="hud"><a href="../">← nants</a><span id="pos"></span></div>
+<script src="viewer.js"></script>
+</body>
+</html>

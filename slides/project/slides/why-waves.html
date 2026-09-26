@@ -1,0 +1,41 @@
+<section id="why-waves" data-transition="fade" style="background:#fbf7f0; color:#241d19; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px">
+  <p style="position:absolute; left:128px; top:128px; width:900px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; font-weight:500; letter-spacing:4px; text-transform:uppercase; color:#b00300">Motivation</p>
+  <h2 style="position:absolute; left:128px; top:180px; width:1500px; font-size:72px; font-weight:600; line-height:1.1">Why the waves, and not just x and y</h2>
+  <ul style="position:absolute; left:128px; top:320px; width:1664px; font-size:34px; line-height:1.5; color:#241d19; padding-left:40px">
+    <li>The waves carry the same information as x and y.</li>
+    <li>A small network learns smooth functions easily and sharp ones very slowly.</li>
+    <li>The waves turn a smooth ramp into a distinct pattern at every cell, so the net can draw detail.</li>
+  </ul>
+    <x-embed style="position:absolute; left:128px; top:600px; width:1664px; height:230px"><style>
+html,body{margin:0;height:100%;background:#fbf7f0;overflow:hidden}#c{display:block}
+</style><canvas id="c" width="1664" height="230"></canvas><script>
+var g=document.getElementById('c').getContext('2d');
+function font(px,w){g.font=(w||500)+' '+px+'px ui-monospace,Menlo,Consolas,monospace';}
+function start(){
+ var N=48,CW=26,Y=60,H=90;
+ // left: one ramp. right: four waves. the same place, told two ways
+ var L=90,R=900;
+ font(17);g.textAlign='left';g.textBaseline='top';g.fillStyle='#7b6f66';
+ g.fillText('x alone: one slope over the whole field',L,10);
+ g.fillText('with the waves: a different pattern at every cell',R,10);
+ for(var i=0;i<N;i++){var t=i/(N-1),x=L+i*15;
+  g.fillStyle='rgba(176,3,0,'+(0.12+0.85*t)+')';g.fillRect(x,Y,13,H);}
+ g.strokeStyle='#e8dccb';g.lineWidth=1;g.strokeRect(L-.5,Y-.5,N*15,H+1);
+ var W=[1,2,4,8];
+ for(var i=0;i<N;i++){var t=i/(N-1),x=R+i*15;
+  for(var k=0;k<4;k++){var v=(Math.sin(Math.PI*W[k]*(2*t-1))+1)/2;
+   g.fillStyle='rgba(176,3,0,'+(0.12+0.85*v)+')';g.fillRect(x,Y+k*(H/4),13,H/4-1);}}
+ g.strokeStyle='#e8dccb';g.strokeRect(R-.5,Y-.5,N*15,H+1);
+ font(15);g.fillStyle='#7b6f66';g.textAlign='left';g.textBaseline='top';
+ g.fillText('neighbouring cells look almost the same',L,Y+H+14);
+ g.fillText('neighbouring cells look different',R,Y+H+14);
+ font(15);g.textAlign='right';for(var k=0;k<4;k++)g.fillText('k='+W[k],R-10,Y+k*(H/4)+3);}
+(function(){var d=false;function go(){if(d)return;d=true;start();}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf('paint')<0)throw 0;
+  var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});
+  po.observe({type:'paint',buffered:true});}catch(_){go();}})();
+</script></x-embed>
+
+  <p style="position:absolute; left:128px; bottom:64px; width:1664px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#7b6f66">Tancik et al. (2020). Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains. NeurIPS 33.</p>
+  <aside>The point in one line: the encoding, not the information, is what let it draw. Why a shallow relu net needs it: it fits smooth functions of its inputs quickly and sharp ones very slowly, and a 28-cell gecko is a sharp function of position; from a plain slope every update smears across the whole field, which is exactly what the failed pictures look like. The waves give each cell its own combination, so a change can stay local, and the four frequencies give coarse to fine: k=1 says which half of the field, k=8 resolves about three cells. Sine and cosine together remove the ambiguity of sine alone. The argument is from Tancik and colleagues, 2020: a small relu net has a spectral bias, it learns smooth functions first and sharp ones very slowly, and feeding the coordinates through sines and cosines at a ladder of frequencies moves the sharp detail into the range it learns easily. The biological cousin is the grid cells of the entorhinal cortex, a periodic code for position at several scales. Our own runs: no compass 0.13, raw x and y 0.10 after 2600 epochs, the full 35 numbers 0.0006.</aside>
+</section>

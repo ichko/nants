@@ -1,0 +1,33 @@
+<section id="turmites" data-transition="fade" style="background:#f4ead9; color:#241d19; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px; display:flex; flex-direction:column; gap:40px">
+  <p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; font-weight:500; letter-spacing:4px; text-transform:uppercase; color:#b00300">Origin</p>
+  <h2 style="font-size:72px; font-weight:600; line-height:1.1; width:740px">Turmites</h2>
+  <p style="font-size:32px; font-weight:400; color:#7b6f66; line-height:1.5; width:700px"><b style="color:#241d19">Tur</b>ing machine + ter<b style="color:#241d19">mite</b>. The same ant, but with more than one <b style="color:#241d19">state</b> and more than one <b style="color:#241d19">colour</b>. Langton's ant is the smallest one.</p>
+  <div style="width:760px; display:flex; flex-direction:column; gap:14px"><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:22px; letter-spacing:3px; text-transform:uppercase; color:#7b6f66">one state, four colours &middot; on each: turn, then paint the next</p><div style="display:flex; gap:16px"><div style="display:flex; flex-direction:column; align-items:center; gap:6px"><div style="width:84px; height:84px; background:#ffffff; border:1px solid #d3c4ad"></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; font-weight:700; color:#241d19">L</p></div><div style="display:flex; flex-direction:column; align-items:center; gap:6px"><div style="width:84px; height:84px; background:#fcdeb9; border:1px solid #d3c4ad"></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; font-weight:700; color:#241d19">L</p></div><div style="display:flex; flex-direction:column; align-items:center; gap:6px"><div style="width:84px; height:84px; background:#c44034; border:1px solid #d3c4ad"></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; font-weight:700; color:#241d19">R</p></div><div style="display:flex; flex-direction:column; align-items:center; gap:6px"><div style="width:84px; height:84px; background:#241d19; border:1px solid #d3c4ad"></div><p style="font-family:'JetBrains Mono', 'Courier New', monospace; font-size:32px; font-weight:700; color:#241d19">R</p></div></div></div>
+  <x-embed style="position:absolute; left:1000px; top:196px; width:792px; height:744px"><style>
+html,body{margin:0;height:100%;background:#f4ead9;overflow:hidden;font-family:ui-monospace,Menlo,Consolas,monospace;color:#7b6f66}
+#c{display:block}#p{text-align:center;font-size:24px;padding-top:10px}
+</style><canvas id="c" width="792" height="700"></canvas><div id="p">LLRR &middot; it grows a symmetric shape, forever</div><script>
+var g=document.getElementById('c').getContext('2d'),N=140,CS=5,X0=46,Y0=0;
+var RULE='LLRR',PAL=["#ffffff", "#fcdeb9", "#c44034", "#241d19"];   // one state, nine colours: reads c, turns, writes c+1
+var grid=new Uint8Array(N*N),x=N>>1,y=N>>1,h=0,D=[[0,-1],[1,0],[0,1],[-1,0]],steps=0,t0=0;
+function board(){g.fillStyle='#FFFFFF';g.fillRect(X0,Y0,N*CS,N*CS);g.strokeStyle='#e8dccb';g.lineWidth=1;g.strokeRect(X0+.5,Y0+.5,N*CS-1,N*CS-1);}
+function cell(i,j){g.fillStyle=PAL[grid[j*N+i]];g.fillRect(X0+i*CS,Y0+j*CS,CS,CS);}
+function ant(){g.save();g.translate(X0+(x+0.5)*CS,Y0+(y+0.5)*CS);g.rotate(h*Math.PI/2);
+ g.beginPath();g.moveTo(0,-7);g.lineTo(5,5);g.lineTo(0,3);g.lineTo(-5,5);g.closePath();g.fillStyle='#FFFFFF';g.fill();g.strokeStyle='#241d19';g.lineWidth=1.2;g.lineJoin='round';g.stroke();g.restore();}
+board();
+function step(){var k=y*N+x,c=grid[k];grid[k]=(c+1)%RULE.length;cell(x,y);h=(h+(RULE[c]==='L'?3:1))%4;
+ x=(x+D[h][0]+N)%N;y=(y+D[h][1]+N)%N;steps++;}
+var px=x,py=y;
+function frame(now){var want=Math.min(steps+300,Math.floor((now-t0)/1000*18000));   // fast: eighteen thousand steps a second
+ for(var v=-1;v<=1;v++)for(var u=-1;u<=1;u++)cell((px+u+N)%N,(py+v+N)%N);
+ while(steps<want)step();px=x;py=y;ant();
+ if(steps<3000000)requestAnimationFrame(frame);}
+function start(){t0=performance.now();requestAnimationFrame(frame);}
+(function(){var d=false;function go(){if(d)return;d=true;start();}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf('paint')<0)throw 0;
+  var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});
+  po.observe({type:'paint',buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <p style="position:absolute; left:128px; bottom:64px; width:800px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#7b6f66">read more: <a href="https://en.wikipedia.org/wiki/Turmite" style="color:#b00300">en.wikipedia.org/wiki/Turmite</a></p>
+  <aside>A turmite is a Turing machine let loose on a grid: a head with a few states, a tape of coloured cells, a table saying what to write, which way to turn and what state to be in next. Langton's ant is the one-state two-colour case. This one has one state and four colours: read the colour under you, turn left on the first two, right on the other two, paint the next colour, step. LLRR grows a symmetric shape that keeps its shape as it grows. The strip on the left is its whole rule.</aside>
+</section>

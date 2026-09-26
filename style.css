@@ -171,6 +171,9 @@ h1 {
 .labgo a:hover { background: var(--red); border-color: var(--deep); color: #fff; box-shadow: 2px 2px 0 var(--deep); }
 .labgo a:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--deep); }
 .labgo a span { display: block; margin-top: 3px; font-size: 11.5px; font-weight: 400; opacity: 0.75; }
+.labgo a.talk { display: block; margin-top: 8px; padding: 0; background: none; border: 0; box-shadow: none; font-size: 12px; font-weight: 400; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+.labgo a.talk:hover { color: var(--red); background: none; box-shadow: none; }
+.labgo a.talk:active { transform: none; }
 
 .lede {
   max-width: 34em;

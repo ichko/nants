@@ -1,0 +1,65 @@
+{
+  "v": 4,
+  "attachments": {},
+  "cover": "cover",
+  "createdOnFiles": {
+    "at": "2026-09-24T12:40:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "faces": {
+    "fraunces": {
+      "family": "Fraunces",
+      "href": "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&display=swap"
+    },
+    "ibm-plex-sans": {
+      "family": "IBM Plex Sans",
+      "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    },
+    "jetbrains-mono": {
+      "family": "JetBrains Mono",
+      "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap"
+    }
+  },
+  "order": [
+    "cover",
+    "langton",
+    "langtons-ant",
+    "turmites",
+    "how",
+    "state-cont",
+    "sense-frame",
+    "the-ant",
+    "lab",
+    "training",
+    "worked",
+    "notquite",
+    "insects",
+    "ant-setup",
+    "why-waves",
+    "stages",
+    "zoo",
+    "robust",
+    "share",
+    "cross",
+    "scatter",
+    "related",
+    "dilate",
+    "references"
+  ],
+  "sections": {
+    "method": {
+      "description": "What our ants read and write: a continuous field, sensed in the ant's own frame",
+      "start": "how"
+    },
+    "origin": {
+      "description": "Who Langton was and what his ant's rule actually is",
+      "start": "langton"
+    },
+    "results": {
+      "description": "Did it work, and what exactly made it work: the world, the ant, the loop",
+      "start": "worked"
+    }
+  },
+  "title": "Langton's ant with a neural network"
+}

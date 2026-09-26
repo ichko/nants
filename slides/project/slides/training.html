@@ -1,0 +1,146 @@
+<section id="training" data-transition="fade" style="background:#fbf7f0">
+  <h2 style="position:absolute; top:128px; left:128px; width:780px; font-family:'IBM Plex Sans', Arial, sans-serif; font-size:80px; font-weight:600; line-height:1.1; color:#241d19">Training</h2>
+  <x-embed style="position:absolute; top:250px; left:128px; width:1664px; height:700px"><style>
+html,body{margin:0;height:100%;background:#fbf7f0;overflow:hidden}
+#c{display:block}
+</style><canvas id="c" width="1664" height="700"></canvas><script>
+var g=document.getElementById('c').getContext('2d');
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+var R=rng(7);
+function ease(u){return u<0?0:u>1?1:u*u*(3-2*u);}
+function pulse(u){return u<0||u>1?0:Math.sin(u*Math.PI);}
+function seg(t,a,b){return t>=a&&t<b?1:0;}
+function font(px){g.font='500 '+px+'px ui-monospace,Menlo,Consolas,monospace';}
+function mix(u){u=Math.max(0,Math.min(1,u));return 'rgb('+Math.round(123+53*u)+','+Math.round(111-108*u)+','+Math.round(102-102*u)+')';}
+function panel(x,y,w,h,title,u){g.fillStyle='#efe2d0';g.fillRect(x+4,y+4,w,h);g.fillStyle='#FFFFFF';g.fillRect(x,y,w,h);
+ g.strokeStyle=u>0.5?'#b00300':'#e8dccb';g.lineWidth=u>0.5?2:1;g.strokeRect(x+.5,y+.5,w-1,h-1);
+ g.font='700 15px ui-monospace,Menlo,Consolas,monospace';g.fillStyle=mix(u);g.textAlign='left';g.textBaseline='top';
+ g.fillText(title.toUpperCase().split('').join(String.fromCharCode(8202)),x+18,y+16);}
+function arrow(x1,y1,x2,y2,u){g.strokeStyle=mix(u);g.lineWidth=2.5;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();
+ var d=Math.atan2(y2-y1,x2-x1);g.fillStyle=mix(u);g.beginPath();g.moveTo(x2,y2);g.lineTo(x2-10*Math.cos(d-0.4),y2-10*Math.sin(d-0.4));g.lineTo(x2-10*Math.cos(d+0.4),y2-10*Math.sin(d+0.4));g.closePath();g.fill();}
+// ---- the target: the lizard, and a colony that gets closer to it round by round ----
+var N=28,TG=new Float32Array(N*N),SH=[
+'.....##.....................','.....###....................','....#####...................','...#######..................','...#######..###.............','...#######..####............','...#######.####.............','....######...##.............','....######..###.....##......','.....#########.....####.....','......########.....#####....','...#############.#####......','...###.###############......','...###.############.........','...################.........','.....###.##########.........','...........########.........','...........#########........','...........#########........','.........###########........','.........######.####........','.........####...####........','..........###....####.......','...........#.....####.###...','..................###..###..','..................####.###..','...................######...','....................####....'];   // the lizard emoji, the very target the real training uses, at 28 by 28
+for(var j=0;j<N;j++)for(var i=0;i<N;i++)TG[j*N+i]=SH[j][i]==='#'?1:0;
+var field=new Float32Array(N*N),shown=new Float32Array(N*N),NA=6,ants=[],round=0,losses=[],
+ STEPS=600;
+function reset(){for(var a=0;a<NA;a++)ants[a]={x:N>>1,y:N>>1,h:0};/* all from the centre, all facing up */for(var k=0;k<N*N;k++)field[k]=0;}
+reset();
+// the colony's skill this round: how much of its walk follows the target; it grows with the rounds
+function skill(){return 1-Math.exp(-round/5);}
+function walk(u){                                    // acts out STEPS steps of the colony, u in 0..1 of the way through
+ var n=Math.floor(u*STEPS);
+ for(var k=0;k<N*N;k++)shown[k]=field[k];
+ var Rw=rng(100+round),s=skill();
+ var A=[];for(var a=0;a<NA;a++)A.push({x:ants[a].x,y:ants[a].y,h:ants[a].h});
+ var D=[[0,-1],[1,0],[0,1],[-1,0]];
+ for(var t=0;t<n;t++)for(var a=0;a<NA;a++){var p=A[a],k=p.y*N+p.x;
+  var want=TG[k]*(0.6+0.4*Rw())*(0.5+0.5*s)+(1-s)*0.35*(Rw()-0.5);
+  shown[k]=Math.max(0,Math.min(1,shown[k]+(want-shown[k])*(0.4+0.5*s)));
+  var best=-1,bv=-1;for(var d=0;d<4;d++){var nx=(p.x+D[d][0]+N)%N,ny=(p.y+D[d][1]+N)%N,v=TG[ny*N+nx]-shown[ny*N+nx]+Rw()*(1.2-s);if(v>bv){bv=v;best=d;}}
+  p.h=Rw()<0.15+0.7*s?best:(p.h+(Rw()<0.5?1:3))%4;p.x=(p.x+D[p.h][0]+N)%N;p.y=(p.y+D[p.h][1]+N)%N;}
+ return A;}
+function loss(f){var e=0;for(var k=0;k<N*N;k++){var d=f[k]-TG[k];e+=d*d;}return e/(N*N);}
+// ---- the stages: run, compare, credit, update, repeat; the sixth runs on ----
+var SEG=[[0,3.0],[3.0,5.0],[5.0,7.0],[7.0,8.6],[8.6,9.8]],PERIOD=9.8,stage=0,t0=0,done=false,L=0.3,pL=0.3;
+window.addEventListener('message',function(e){var k=e.data&&e.data.nantsTrain;if(k>0){stage=k;t0=performance.now();done=false;}});
+function speed(){return stage===5?2.5:stage===6?6:1;}   // repeat runs the loop on, faster; the last button, faster still
+function tau(now){var T=(now-t0)/1000*speed();if(stage===0)return -1;if(stage>=5)return (T+SEG[4][0])%PERIOD;var sg=SEG[stage-1];return sg[0]+Math.min(T,sg[1]-sg[0]-0.001);}
+function commit(){pL=L;losses.push(L);round++;reset();}   // every round starts again: blank board, ants at the centre
+var CS=13,FX=60,FY=140,TX2=FX+N*CS+60;
+function board(x,y,f,ink){for(var j=0;j<N;j++)for(var i=0;i<N;i++){var v=f[j*N+i];g.fillStyle='#FFFFFF';g.fillRect(x+i*CS,y+j*CS,CS,CS);
+  if(v>0.02){g.fillStyle=ink?'rgba(36,29,25,'+(v*0.8)+')':'rgba(196,64,52,'+(v*0.85)+')';g.fillRect(x+i*CS,y+j*CS,CS,CS);}
+  g.strokeStyle='#e8dccb';g.lineWidth=1;g.strokeRect(x+i*CS+.5,y+j*CS+.5,CS-1,CS-1);}}
+function draw(now){
+ var T=tau(now);
+ if(stage>=5&&T<0.3&&draw.was>PERIOD-0.5)commit();   // the loop wraps: the round is done
+ draw.was=T;g.clearRect(0,0,1664,700);
+ var uRun=seg(T,0,3),uCmp=seg(T,3,5),uCred=seg(T,5,7),uUpd=seg(T,7,8.6),uRep=seg(T,8.6,9.8);
+ // -- run: the colony walks a hundred steps
+ var A=walk(T<0?0:ease(T/2.8));L=loss(shown);
+ panel(FX-30,90,N*CS+60,N*CS+120,'run',uRun);
+ board(FX,FY,shown,false);
+ for(var a=0;a<NA;a++){var p=A[a];g.save();g.translate(FX+(p.x+0.5)*CS,FY+(p.y+0.5)*CS);g.rotate(p.h*Math.PI/2);
+  g.beginPath();g.moveTo(0,-8);g.lineTo(6,6);g.lineTo(0,3);g.lineTo(-6,6);g.closePath();g.fillStyle='#FFFFFF';g.fill();g.strokeStyle='#241d19';g.lineWidth=1.5;g.lineJoin='round';g.stroke();g.restore();}
+ font(17);g.fillStyle=mix(uRun);g.textAlign='center';g.textBaseline='top';g.fillText('round '+(round+1)+' · ants share one brain',FX+N*CS/2,FY+N*CS+22);
+ // -- compare: the drawing against the target; the loss is their squared difference
+ var cmp=ease((T-3.0)/0.8);
+ panel(TX2-30,90,N*CS+60,N*CS+120,'compare',uCmp);
+ board(TX2,FY,TG,true);
+ g.fillStyle='rgba(196,64,52,'+(0.85*cmp)+')';for(var j=0;j<N;j++)for(var i=0;i<N;i++){var v=shown[j*N+i];if(v>0.02){g.globalAlpha=v*cmp;g.fillRect(TX2+i*CS,FY+j*CS,CS,CS);}}g.globalAlpha=1;
+ font(17);g.fillStyle=mix(uCmp);g.textAlign='center';g.textBaseline='top';g.fillText('target in ink · drawing in red',TX2+N*CS/2,FY+N*CS+22);
+ arrow(FX+N*CS+36,FY+N*CS/2,TX2-36,FY+N*CS/2,uCmp);
+ // -- the loss, as a bar and a curve
+ var LX=TX2+N*CS+80,LW=380;
+ panel(LX-30,90,LW+60,220,'loss · MSE',uCmp+uUpd);
+ var shownL=pL+(L-pL)*cmp,bw=(LW-20)*Math.min(1,shownL/0.3);
+ g.fillStyle='#e8dccb';g.fillRect(LX,150,LW-20,26);g.fillStyle='#b00300';g.fillRect(LX,150,bw,26);
+ font(22);g.fillStyle='#241d19';g.textAlign='left';g.textBaseline='top';g.fillText(shownL.toFixed(3),LX,190);
+ var CY0=290,CH=60,pts=losses.slice(-24);g.strokeStyle='#e8dccb';g.lineWidth=1;g.beginPath();g.moveTo(LX,CY0+.5);g.lineTo(LX+LW-20,CY0+.5);g.stroke();
+ g.strokeStyle='#b00300';g.lineWidth=2.5;g.beginPath();
+ for(var i=0;i<pts.length;i++){var x=LX+i*(LW-20)/24,y=CY0-CH*Math.min(1,pts[i]/0.3);if(i)g.lineTo(x,y);else g.moveTo(x,y);}
+ if(uUpd||stage>=5&&T>=7){var x=LX+pts.length*(LW-20)/24,y=CY0-CH*Math.min(1,L/0.3);if(pts.length)g.lineTo(x,y);g.stroke();g.fillStyle='#b00300';g.beginPath();g.arc(x,y,5,0,6.283);g.fill();}else g.stroke();
+ // -- credit: the loss flows back: through the writes by backprop, into the turns by REINFORCE
+ var BX=LX,BY=340,NX=[BX+40,BX+170,BX+300],NY=[[],[],[]];
+ for(var i=0;i<5;i++)NY[0].push(BY+48+i*32);for(var i=0;i<3;i++)NY[1].push(BY+80+i*32);for(var i=0;i<4;i++)NY[2].push(BY+64+i*32);
+ panel(BX-30,BY,LW+60,250,'credit · what to change',uCred);
+ var back=pulse((T-5.2)/1.6),wob=uUpd?pulse((T-7.2)/1.2):0;
+ for(var a0=0;a0<2;a0++)for(var i=0;i<NY[a0].length;i++)for(var j=0;j<NY[a0+1].length;j++){
+  var lit=back>0.05&&((a0===1&&back<0.6)||(a0===0&&back>0.3));
+  g.strokeStyle=lit?'rgba(176,3,0,'+(0.25+0.6*back)+')':'#e8dccb';g.lineWidth=lit?1.5:1;g.beginPath();g.moveTo(NX[a0],NY[a0][i]);g.lineTo(NX[a0+1],NY[a0+1][j]);g.stroke();}
+ var Rn=rng(round*13+1);
+ for(var col=0;col<3;col++)for(var i=0;i<NY[col].length;i++){var jx=(Rn()-0.5)*8*wob,jy=(Rn()-0.5)*8*wob;
+  g.beginPath();g.arc(NX[col]+jx,NY[col][i]+jy,11,0,6.283);g.fillStyle=uUpd&&wob>0.05?'#b00300':'#241d19';g.fill();}
+ if(uCred||uUpd){font(15);g.fillStyle=mix(1);g.textAlign='left';g.textBaseline='top';
+  g.fillText(uCred?'writes: backprop through the field':'weights nudged a little',BX,BY+204);
+  if(uCred)g.fillText('turns: REINFORCE, better rounds more likely',BX,BY+224);}
+ arrow(LX+LW/2,312,LX+LW/2,BY-8,uCred);
+ // -- the buttons and the line
+ var BT=[['1','run'],['2','compare'],['3','credit'],['4','update'],['5','repeat'],['▶','faster']],
+  TXT=['Click anywhere to step through one round of training.',
+       'Run: from a blank board, the colony walks and draws, all ants with the same brain.',
+       'Compare: the drawing is held against the target; the loss is their mean squared difference.',
+       'Credit: the writes get their gradient by backprop through the field; the turns by REINFORCE.',
+       'Update: every weight moves a little the way that lowered the loss.',
+       'Repeat: a fresh board, the same brain a little better, round after round.',
+       'Faster still: watch the loss fall and the drawing settle.'];
+ var cx=60,cy=612,ph=44;g.font='500 19px ui-monospace,Menlo,Consolas,monospace';g.textBaseline='middle';
+ for(var b=0;b<6;b++){var on=stage===b+1,tx=BT[b][0]+'  '+BT[b][1],pw=g.measureText(tx).width+36;
+  g.fillStyle=on?'#7d0200':'#efe2d0';g.fillRect(cx+2,cy+2,pw,ph);g.fillStyle=on?'#b00300':'#fcdeb9';g.fillRect(cx,cy,pw,ph);
+  g.strokeStyle=on?'#7d0200':'#efe2d0';g.lineWidth=1;g.strokeRect(cx+.5,cy+.5,pw-1,ph-1);
+  g.fillStyle=on?'#FFFFFF':'#7d0200';g.textAlign='left';g.fillText(tx,cx+18,cy+ph/2+1);cx+=pw+14;}
+ font(21);g.fillStyle=stage?'#241d19':'#7b6f66';g.textAlign='left';g.textBaseline='top';g.fillText(TXT[stage],60,cy+ph+16);
+ requestAnimationFrame(draw);}
+draw.was=0;
+function start(){t0=performance.now();requestAnimationFrame(draw);}
+(function(){var d=false;function go(){if(d)return;d=true;start();}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf('paint')<0)throw 0;
+  var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});
+  po.observe({type:'paint',buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <x-embed data-build-in="fade 1" style="position:absolute; left:148px; top:1040px; width:12px; height:12px"><style>html,body{margin:0;background:#fbf7f0}</style><script>
+(function(){var d=false;function go(){if(d)return;d=true;try{for(var i=0;i<parent.frames.length;i++)parent.frames[i].postMessage({nantsTrain:1},"*");}catch(_){}}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf("paint")<0)throw 0;var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});po.observe({type:"paint",buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <x-embed data-build-in="fade 2" style="position:absolute; left:168px; top:1040px; width:12px; height:12px"><style>html,body{margin:0;background:#fbf7f0}</style><script>
+(function(){var d=false;function go(){if(d)return;d=true;try{for(var i=0;i<parent.frames.length;i++)parent.frames[i].postMessage({nantsTrain:2},"*");}catch(_){}}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf("paint")<0)throw 0;var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});po.observe({type:"paint",buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <x-embed data-build-in="fade 3" style="position:absolute; left:188px; top:1040px; width:12px; height:12px"><style>html,body{margin:0;background:#fbf7f0}</style><script>
+(function(){var d=false;function go(){if(d)return;d=true;try{for(var i=0;i<parent.frames.length;i++)parent.frames[i].postMessage({nantsTrain:3},"*");}catch(_){}}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf("paint")<0)throw 0;var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});po.observe({type:"paint",buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <x-embed data-build-in="fade 4" style="position:absolute; left:208px; top:1040px; width:12px; height:12px"><style>html,body{margin:0;background:#fbf7f0}</style><script>
+(function(){var d=false;function go(){if(d)return;d=true;try{for(var i=0;i<parent.frames.length;i++)parent.frames[i].postMessage({nantsTrain:4},"*");}catch(_){}}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf("paint")<0)throw 0;var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});po.observe({type:"paint",buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <x-embed data-build-in="fade 5" style="position:absolute; left:228px; top:1040px; width:12px; height:12px"><style>html,body{margin:0;background:#fbf7f0}</style><script>
+(function(){var d=false;function go(){if(d)return;d=true;try{for(var i=0;i<parent.frames.length;i++)parent.frames[i].postMessage({nantsTrain:5},"*");}catch(_){}}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf("paint")<0)throw 0;var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});po.observe({type:"paint",buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <x-embed data-build-in="fade 6" style="position:absolute; left:248px; top:1040px; width:12px; height:12px"><style>html,body{margin:0;background:#fbf7f0}</style><script>
+(function(){var d=false;function go(){if(d)return;d=true;try{for(var i=0;i<parent.frames.length;i++)parent.frames[i].postMessage({nantsTrain:6},"*");}catch(_){}}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf("paint")<0)throw 0;var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});po.observe({type:"paint",buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <aside>One round of training, a stage per click. Run: the colony walks a hundred steps and draws. Compare: the drawing against the target, mean squared error. Credit: the writes are differentiable, so their gradient comes back by backprop through the field; the turns are sampled, so they are credited by REINFORCE, rounds that scored better made more likely. Update: a small step of the optimiser. Repeat from a blank board, the ants back at the centre. The sixth click runs round after round; the curve is the loss falling. The drawing here is a sketch of what training does, not the real optimiser.</aside>
+</section>

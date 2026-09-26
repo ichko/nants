@@ -1,0 +1,187 @@
+<section id="the-ant" data-transition="fade" style="background:#fbf7f0; color:#241d19; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px">
+  <h2 style="position:absolute; left:128px; top:128px; width:780px; font-size:80px; font-weight:600; line-height:1.1">Method</h2>
+
+  <x-embed style="position:absolute; left:128px; top:250px; width:1664px; height:700px"><style>
+html,body{margin:0;height:100%;background:#fbf7f0;overflow:hidden}
+#c{display:block}
+</style><canvas id="c" width="1664" height="700"></canvas><script>
+var g=document.getElementById('c').getContext('2d');
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+var R=rng(2024);
+function gauss(){var u=R()||1e-9,v=R();return Math.sqrt(-2*Math.log(u))*Math.cos(6.283*v);}
+// ---- the stack, as on the last slide ----
+var N=11,W2=27,H2=13.5,LH=64,CX=330,CY=115,L=3;
+var COL=[[196,64,52],[74,140,92],[66,110,170]],VMAX=0.85;   // a red, a green, a blue: calm, not grey
+var field=[];for(var l=0;l<L;l++){field.push(new Float32Array(N*N));var C=4,cg=[];for(var k=0;k<C*C;k++)cg.push(R());   // a smooth carpet: a coarse random grid, bilinearly stretched, wrapping
+ for(var j=0;j<N;j++)for(var i=0;i<N;i++){var x=i/N*C,y=j/N*C,x0=Math.floor(x),y0=Math.floor(y),fx=x-x0,fy=y-y0,x1=(x0+1)%C,y1=(y0+1)%C;
+  var v=cg[y0*C+x0]*(1-fx)*(1-fy)+cg[y0*C+x1]*fx*(1-fy)+cg[y1*C+x0]*(1-fx)*fy+cg[y1*C+x1]*fx*fy;field[l][j*N+i]=0.1+0.85*v;}}
+var RING=[[0,-1],[1,0],[0,1],[-1,0]],QC=[1,0,-1,0],QS=[0,1,0,-1],SX=[[-1,0,1],[-2,0,2],[-1,0,1]];
+var ai=5,aj=5,head=0,KZ=6;
+// ---- a real brain: 9 senses in, 6 hidden, 6 out (3 for the turn, 3 to write) ----
+var NI=9,NH=6,NO=6,W1=[],B1=[],Wo=[],Bo=[];
+for(var i=0;i<NI*NH;i++)W1.push(gauss()*Math.sqrt(2/NI)*1.3);for(var i=0;i<NH;i++)B1.push(gauss()*0.3);
+for(var i=0;i<NH*NO;i++)Wo.push(gauss()*Math.sqrt(2/NH)*1.3);for(var i=0;i<NO;i++)Bo.push(gauss()*0.3);
+function at(l,i,j){return field[l][((j+N)%N)*N+((i+N)%N)];}
+function sense(){var x=[],c=QC[head],s=QS[head];
+ for(var l=0;l<L;l++){var gx=0,gy=0;
+  for(var v=-1;v<=1;v++)for(var u=-1;u<=1;u++){var f=at(l,ai+u,aj+v);gx+=SX[v+1][u+1]*f/4;gy+=SX[u+1][v+1]*f/4;}
+  x.push(at(l,ai,aj),gx*c+gy*s,gy*c-gx*s);}
+ return x;}
+function think(x){var h=[],o=[];
+ for(var j=0;j<NH;j++){var a=B1[j];for(var i=0;i<NI;i++)a+=W1[j*NI+i]*x[i];h.push(Math.tanh(a));}
+ for(var j=0;j<NO;j++){var a=Bo[j];for(var i=0;i<NH;i++)a+=Wo[j*NH+i]*h[i];o.push(a);}
+ return o;}
+function ease(u){return u<0?0:u>1?1:u*u*(3-2*u);}
+function pulse(u){return u<0||u>1?0:Math.sin(u*Math.PI);}
+function seg(t,a,b){return t>=a&&t<b?1:0;}
+function font(px){g.font='500 '+px+'px ui-monospace,Menlo,Consolas,monospace';}
+// ---- one step, computed up front; the previous step's numbers stay on screen until they are replaced ----
+var per,out,prob,write,turn,pPer=[0,0,0,0,0,0,0,0,0],pProb=[0,0,0],pWrite=[0,0,0],pTurn=1;
+function newStep(){pPer=[0,0,0,0,0,0,0,0,0];pProb=[0,0,0];pWrite=[0,0,0];pTurn=turn;per=sense();out=think(per);   // the cards start empty each step
+ var m=Math.max(out[0],out[1],out[2]),e=[Math.exp(out[0]-m),Math.exp(out[1]-m),Math.exp(out[2]-m)],z=e[0]+e[1]+e[2];
+ prob=[e[0]/z,e[1]/z,e[2]/z];var r=R();turn=r<prob[0]?-1:r<prob[0]+prob[1]?0:1;
+ write=[Math.tanh(out[3])*0.6,Math.tanh(out[4])*0.6,Math.tanh(out[5])*0.6];}
+function commit(){for(var l=0;l<L;l++)field[l][aj*N+ai]=Math.max(0,Math.min(1,field[l][aj*N+ai]+write[l]));
+ head=(head+turn+4)%4;ai=(ai+RING[head][0]+N)%N;aj=(aj+RING[head][1]+N)%N;newStep();}
+newStep();
+// ---- the timeline of one step, in seconds; each click plays one segment, the last click loops the whole thing ----
+var SEG=[[0,3.2],[3.2,5.4],[5.4,6.2],[6.2,7.2],[7.2,9.6]],PERIOD=9.6;   // see, think, turn, write, move
+var stage=0,t0=0,done=false;
+window.addEventListener('message',function(e){var k=e.data&&e.data.nantsStage;if(k>0){stage=k;t0=performance.now();done=false;}});
+function tau(now){var T=(now-t0)/1000;
+ if(stage===0)return -1;
+ if(stage===6)return T%PERIOD;
+ var sg=SEG[stage-1];return sg[0]+Math.min(T,sg[1]-sg[0]-0.001);}
+
+function P(i,j,l,z){return[CX+(i-j)*W2,CY+(i+j)*H2+l*LH-(z||0)];}
+function cell(i,j,l,z){var a=P(i,j,l,z),b=P(i+1,j,l,z),c=P(i+1,j+1,l,z),d=P(i,j+1,l,z);
+ g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.lineTo(c[0],c[1]);g.lineTo(d[0],d[1]);g.closePath();}
+function kcell(cx,cy,ca,sa,l,z){g.beginPath();var C=[[-0.5,-0.5],[0.5,-0.5],[0.5,0.5],[-0.5,0.5]];
+ for(var k=0;k<4;k++){var u=C[k][0],v=C[k][1],q=P(cx+u*ca-v*sa,cy+u*sa+v*ca,l,z);if(k)g.lineTo(q[0],q[1]);else g.moveTo(q[0],q[1]);}g.closePath();}
+function sq(x,y,s,v,c){g.fillStyle='#FFFFFF';g.fillRect(x,y,s,s);
+ var m=Math.min(1,Math.abs(v));if(m>0.02){m=(0.4+0.6*m)*VMAX;g.fillStyle=c?'rgba('+c[0]+','+c[1]+','+c[2]+','+(m*(v>0?1:0.55))+')':'rgba(36,29,25,'+(m*(v>0?1:0.45))+')';g.fillRect(x,y,s,s);}
+ g.strokeStyle='#d3c4ad';g.lineWidth=1;g.strokeRect(x+.5,y+.5,s-1,s-1);}
+function mix(u){u=Math.max(0,Math.min(1,u));return 'rgb('+Math.round(123+53*u)+','+Math.round(111-108*u)+','+Math.round(102-102*u)+')';}   // muted grey to the red
+function panel(x,y,w,h,title,u){g.fillStyle='#efe2d0';g.fillRect(x+4,y+4,w,h);g.fillStyle='#FFFFFF';g.fillRect(x,y,w,h);   // a white card with the site's hard sand shadow
+ g.strokeStyle=u>0.5?'#b00300':'#e8dccb';g.lineWidth=u>0.5?2:1;g.strokeRect(x+.5,y+.5,w-1,h-1);
+ g.font='700 15px ui-monospace,Menlo,Consolas,monospace';g.fillStyle=mix(u);g.textAlign='left';g.textBaseline='top';
+ var t=title.toUpperCase().split('').join(String.fromCharCode(8202));g.fillText(t,x+18,y+16);}
+function label(s,x,y,u){font(15);g.fillStyle=mix(u);g.textAlign='center';g.textBaseline='top';g.fillText(s,x,y);}
+function arrow(x1,y1,x2,y2,u){g.strokeStyle=mix(u);g.lineWidth=2.5;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();
+ var d=Math.atan2(y2-y1,x2-x1);g.fillStyle=mix(u);g.beginPath();g.moveTo(x2,y2);g.lineTo(x2-10*Math.cos(d-0.4),y2-10*Math.sin(d-0.4));g.lineTo(x2-10*Math.cos(d+0.4),y2-10*Math.sin(d+0.4));g.closePath();g.fill();}
+
+function draw(now){
+ var T=tau(now);
+ if(stage===6&&T<0.05&&draw.was>PERIOD-0.5)commit();
+ if(stage===5&&(now-t0)/1000>=SEG[4][1]-SEG[4][0]&&!done){done=true;commit();stage=0;T=-1;}
+ draw.was=T;
+ g.clearRect(0,0,1664,700);
+ // -- see: the kernel sinks through the sheets, one reading per sheet
+ var kl;if(T<0.8)kl=-KZ/LH;
+ else if(T<3.2){var s=(T-0.8)/0.8,li=Math.floor(s),f=s-li,from=li===0?-KZ/LH:li-1;kl=from+(li-from)*ease(Math.min(1,f/0.4));}
+ else if(T<7.2)kl=2;else kl=2-(2+KZ/LH)*ease((T-7.2)/0.6);
+ var ready=[0,0,0];for(var l=0;l<3;l++)ready[l]=ease((T-(1.2+0.8*l))/0.25);
+ var o=ease((T-4.9)/0.4),split=ease((T-5.4)/0.7),wr=ease((T-6.2)/0.6),wrote=ease((T-6.8)/0.4);
+ var h0=head*Math.PI/2,h1=((head+turn+4)%4)*Math.PI/2,dA=h1-h0;if(dA>Math.PI)dA-=2*Math.PI;if(dA<-Math.PI)dA+=2*Math.PI;
+ var sh=ease((T-7.8)/0.6),ang=h0+dA*sh;
+ var mv=ease((T-8.4)/0.7),d=RING[(head+turn+4)%4],px=ai+d[0]*mv,py=aj+d[1]*mv;
+ var dr=1-ease((T-7.2)/0.5);   // as the kernel rises, see, turn and write drain to zero
+ var uSee=seg(T,0,3.2),uThink=seg(T,3.2,5.4),uTurn=seg(T,5.4,6.2),uWrite=seg(T,6.2,7.2);
+ // -- sheets
+ for(var l=L-1;l>=0;l--){var c=COL[l];g.globalAlpha=1-0.75*ease((kl-l+0.2)/0.7);
+  var q=[P(0,0,l,0),P(N,0,l,0),P(N,N,l,0),P(0,N,l,0)];
+  function sheet(ox,oy){g.beginPath();g.moveTo(q[0][0]+ox,q[0][1]+oy);g.lineTo(q[1][0]+ox,q[1][1]+oy);g.lineTo(q[2][0]+ox,q[2][1]+oy);g.lineTo(q[3][0]+ox,q[3][1]+oy);g.closePath();}
+  sheet(0,0);g.shadowColor='rgba(36,29,25,0.35)';g.shadowBlur=14;g.shadowOffsetY=10;g.fillStyle='#FFFFFF';g.fill();g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetY=0;   // a soft shadow, straight down
+  for(var j=0;j<N;j++)for(var i=0;i<N;i++){var v=field[l][j*N+i];
+   if(i===ai&&j===aj)v=Math.max(0,Math.min(1,v+write[l]*wrote));
+   cell(i,j,l,0);if(v>0.01){g.fillStyle='rgba('+c[0]+','+c[1]+','+c[2]+','+(v*VMAX)+')';g.fill();}
+   g.strokeStyle='#FFFFFF';g.lineWidth=1.5;g.stroke();}   // clear white boundaries between the cells
+  g.globalAlpha=1;
+  if(kl>l-0.5&&kl<=l+0.5||(l===0&&kl<0)){var lift=(l-kl)*LH,ca=Math.cos(ang),sa=Math.sin(ang);
+   if(lift>0.5){g.shadowColor='rgba(36,29,25,'+(0.35*Math.min(1,lift/KZ))+')';g.shadowBlur=14;g.shadowOffsetY=lift*0.6;}
+   for(var v=-1;v<=1;v++)for(var u=-1;u<=1;u++){var w=SX[v+1][u+1];
+    kcell(px+0.5+u*ca-v*sa,py+0.5+u*sa+v*ca,ca,sa,l,lift);
+    g.fillStyle=w>0?'rgba(36,29,25,'+(0.55+0.35*w/2)+')':w<0?'rgba(36,29,25,'+(0.12+0.1*(-w)/2)+')':'rgba(36,29,25,0.32)';g.fill();
+    g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetY=0;g.strokeStyle='#241d19';g.lineWidth=1.5;g.stroke();}}
+ }
+ // -- the ant
+ var ac=P(px+0.5,py+0.5,0,16),dd=[Math.sin(ang),-Math.cos(ang)],dx=(dd[0]-dd[1])*W2,dy=(dd[0]+dd[1])*H2,th=Math.atan2(dy,dx),scale=1+0.12*pulse((T-0.1)/0.7);
+ g.save();g.translate(ac[0],ac[1]);g.rotate(th+Math.PI/2);g.scale(scale,scale);
+ g.shadowColor='rgba(36,29,25,0.5)';g.shadowBlur=10;g.shadowOffsetY=6;g.beginPath();g.moveTo(0,-19);g.lineTo(14,15);g.lineTo(0,8);g.lineTo(-14,15);g.closePath();   // white, outlined in ink: it shows on any sheet
+ g.fillStyle='#FFFFFF';g.fill();g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetY=0;g.strokeStyle='#241d19';g.lineWidth=2.5;g.lineJoin='round';g.stroke();g.restore();
+ // -- see: a card with one row of readings per sheet: here, ahead, aside
+ var S=52,G=10,PX=720,PY=200,SW=3*(S+G)-G;
+ panel(PX-36,120,SW+72,380,'see',uSee);
+ for(var l=0;l<3;l++)for(var c=0;c<3;c++){var k=l*3+c,a=ease((T-(1.2+0.8*l+0.18*c))/0.18);   // row by row as the kernel passes each sheet, square by square within the row
+  sq(PX+c*(S+G),PY+l*(S+G),S,(pPer[k]+(per[k]-pPer[k])*a)*(c?5:1.2)*dr,COL[l]);}
+ var CL=['here','ahead','aside'];for(var c=0;c<3;c++)label(CL[c],PX+c*(S+G)+S/2,PY+3*(S+G)+2,uSee);
+ // -- think: the net
+ var TX=PX+SW+36+40,TW=300;panel(TX,120,TW,380,'think',uThink);
+ var NX=[TX+50,TX+150,TX+250],NY=[[],[],[]];
+ for(var i=0;i<5;i++)NY[0].push(196+i*62);for(var i=0;i<3;i++)NY[1].push(258+i*62);for(var i=0;i<4;i++)NY[2].push(227+i*62);
+ arrow(PX+SW+36+6,320,TX-6,320,uThink);
+ g.strokeStyle='#e8dccb';g.lineWidth=1;
+ for(var a0=0;a0<2;a0++)for(var i=0;i<NY[a0].length;i++)for(var j=0;j<NY[a0+1].length;j++){g.beginPath();g.moveTo(NX[a0],NY[a0][i]);g.lineTo(NX[a0+1],NY[a0+1][j]);g.stroke();}
+ for(var col=0;col<3;col++){var lit=pulse((T-(3.3+col*0.4))/0.7);
+  for(var i=0;i<NY[col].length;i++){g.beginPath();g.arc(NX[col],NY[col][i],16+7*lit,0,6.283);g.fillStyle=lit>0.05?'#b00300':'#241d19';g.fill();}}
+ // -- turn and write: two cards, fed by the net
+ var RX=TX+TW+40,RW=300,YA=120+90,YB=320+90;
+ panel(RX,120,RW,180,'turn',uTurn);panel(RX,320,RW,180,'write',uWrite);
+ arrow(TX+TW+6,YA,RX-6,YA,uTurn);arrow(TX+TW+6,YB,RX-6,YB,uWrite);
+ var BW=52,BG=16,BH=96,BX=RX+(RW-3*BW-2*BG)/2,BY=120+150,LBL=['L','F','R'],tsel=split>0.5?turn:pTurn;
+ for(var k=0;k<3;k++){var x=BX+k*(BW+BG),h=BH*(pProb[k]+(prob[k]-pProb[k])*split)*dr;
+  g.fillStyle=k===tsel+1?'#b00300':'#e8dccb';g.fillRect(x,BY-h,BW,h);label(LBL[k],x+BW/2,BY+6,uTurn);}
+ g.strokeStyle='#e8dccb';g.lineWidth=1;g.beginPath();g.moveTo(BX-8,BY+.5);g.lineTo(BX+3*BW+2*BG+8,BY+.5);g.stroke();
+ var WX=RX+(RW-3*(S+G)+G-40)/2+40;
+ font(30);g.fillStyle=mix(uWrite);g.textAlign='center';g.textBaseline='middle';g.fillText('+',WX-30,YB+8);
+ for(var l=0;l<3;l++)sq(WX+l*(S+G),YB+8-S/2,S,(pWrite[l]+(write[l]-pWrite[l])*wr)/0.4*dr,COL[l]);
+ // -- the controls: one button per stage, the current one lit, and a line saying what it does
+ var BT=[['1','see'],['2','think'],['3','turn'],['4','write'],['5','move'],['▶','run']],
+  TXT=['Click anywhere to step through one move of the ant.',
+       'See: the kernel reads the 3×3 patch on every sheet — here, ahead, aside.',
+       'Think: the net turns nine readings into six numbers.',
+       'Turn: three of them are the chances of left, forward, right; one is drawn.',
+       'Write: the other three are added to the square it stands on.',
+       'Move: it turns, steps forward, and is ready to go again.',
+       'Run: it walks on its own, one step after another.'];
+ var cx=700,cy=588,ph=44;g.font='500 19px ui-monospace,Menlo,Consolas,monospace';g.textBaseline='middle';
+ for(var b=0;b<6;b++){var on=stage===b+1,tx=BT[b][0]+'  '+BT[b][1],pw=g.measureText(tx).width+36;
+  g.fillStyle=on?'#7d0200':'#efe2d0';g.fillRect(cx+2,cy+2,pw,ph);g.fillStyle=on?'#b00300':'#fcdeb9';g.fillRect(cx,cy,pw,ph);
+  g.strokeStyle=on?'#7d0200':'#efe2d0';g.lineWidth=1;g.strokeRect(cx+.5,cy+.5,pw-1,ph-1);
+  g.fillStyle=on?'#FFFFFF':'#7d0200';g.textAlign='left';g.fillText(tx,cx+18,cy+ph/2+1);cx+=pw+14;}
+ font(21);g.fillStyle=stage?'#241d19':'#7b6f66';g.textAlign='left';g.textBaseline='top';g.fillText(TXT[stage],700,cy+ph+22);
+ requestAnimationFrame(draw);}
+draw.was=0;
+function start(){t0=performance.now();requestAnimationFrame(draw);}
+(function(){var d=false;function go(){if(d)return;d=true;start();}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf('paint')<0)throw 0;
+  var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});
+  po.observe({type:'paint',buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <x-embed data-build-in="fade 1" style="position:absolute; left:148px; top:1040px; width:12px; height:12px"><style>html,body{margin:0;background:#fbf7f0}</style><script>
+(function(){var d=false;function go(){if(d)return;d=true;try{for(var i=0;i<parent.frames.length;i++)parent.frames[i].postMessage({nantsStage:1},"*");}catch(_){}}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf("paint")<0)throw 0;var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});po.observe({type:"paint",buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <x-embed data-build-in="fade 2" style="position:absolute; left:168px; top:1040px; width:12px; height:12px"><style>html,body{margin:0;background:#fbf7f0}</style><script>
+(function(){var d=false;function go(){if(d)return;d=true;try{for(var i=0;i<parent.frames.length;i++)parent.frames[i].postMessage({nantsStage:2},"*");}catch(_){}}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf("paint")<0)throw 0;var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});po.observe({type:"paint",buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <x-embed data-build-in="fade 3" style="position:absolute; left:188px; top:1040px; width:12px; height:12px"><style>html,body{margin:0;background:#fbf7f0}</style><script>
+(function(){var d=false;function go(){if(d)return;d=true;try{for(var i=0;i<parent.frames.length;i++)parent.frames[i].postMessage({nantsStage:3},"*");}catch(_){}}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf("paint")<0)throw 0;var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});po.observe({type:"paint",buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <x-embed data-build-in="fade 4" style="position:absolute; left:208px; top:1040px; width:12px; height:12px"><style>html,body{margin:0;background:#fbf7f0}</style><script>
+(function(){var d=false;function go(){if(d)return;d=true;try{for(var i=0;i<parent.frames.length;i++)parent.frames[i].postMessage({nantsStage:4},"*");}catch(_){}}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf("paint")<0)throw 0;var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});po.observe({type:"paint",buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <x-embed data-build-in="fade 5" style="position:absolute; left:228px; top:1040px; width:12px; height:12px"><style>html,body{margin:0;background:#fbf7f0}</style><script>
+(function(){var d=false;function go(){if(d)return;d=true;try{for(var i=0;i<parent.frames.length;i++)parent.frames[i].postMessage({nantsStage:5},"*");}catch(_){}}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf("paint")<0)throw 0;var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});po.observe({type:"paint",buffered:true});}catch(_){go();}})();
+</script></x-embed>
+  <x-embed data-build-in="fade 6" style="position:absolute; left:248px; top:1040px; width:12px; height:12px"><style>html,body{margin:0;background:#fbf7f0}</style><script>
+(function(){var d=false;function go(){if(d)return;d=true;try{for(var i=0;i<parent.frames.length;i++)parent.frames[i].postMessage({nantsStage:6},"*");}catch(_){}}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf("paint")<0)throw 0;var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});po.observe({type:"paint",buffered:true});}catch(_){go();}})();
+</script></x-embed>
+
+  <aside>A real simulation. Each click on the slide plays one stage and lights its button: see, think, turn, write, move; the sixth click lets it run on its own. The arrow buttons of the viewer move between slides. The line under the buttons says what the stage does; read it out or paraphrase.</aside>
+</section>

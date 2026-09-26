@@ -1,0 +1,162 @@
+<section id="langtons-ant" data-transition="fade" style="background:#fbf7f0; color:#241d19; font-family:'IBM Plex Sans', Arial, sans-serif; padding:128px 128px 160px">
+  <h2 style="position:absolute; left:128px; top:150px; width:780px; font-size:80px; font-weight:600; line-height:1.1">Langton's ant</h2>
+
+  <p data-build-in="rise 1" style="position:absolute; left:128px; top:312px; width:760px; font-size:38px; color:#7b6f66">A <b style="color:#241d19">grid</b></p>
+  <p data-build-in="rise 2" style="position:absolute; left:128px; top:388px; width:760px; font-size:38px; color:#7b6f66">A <b style="color:#241d19">state</b></p>
+  <p data-build-in="rise 3" style="position:absolute; left:128px; top:464px; width:760px; font-size:38px; color:#7b6f66">An <b style="color:#241d19">entity</b></p>
+  <p data-build-in="rise 3" style="position:absolute; left:184px; top:530px; width:704px; font-size:32px; color:#7b6f66">with a <b style="color:#241d19">position</b></p>
+  <p data-build-in="rise 4" style="position:absolute; left:184px; top:586px; width:704px; font-size:32px; color:#7b6f66">with a <b style="color:#241d19">direction</b></p>
+  <p data-build-in="rise 5" style="position:absolute; left:128px; top:662px; width:760px; font-size:38px; color:#7b6f66">And a <b style="color:#241d19">rule</b></p>
+  <p data-build-in="fade 5" style="position:absolute; left:128px; top:726px; width:760px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:30px; line-height:1.5; color:#241d19">on white&#8195;&#8594;&#8195;turn right<br>on black&#8195;&#8594;&#8195;turn left<br>then&#8195;&#8195;&#8195;&#8195;&#8594;&#8195;flip it, step</p>
+  <p data-build-in="rise 7" style="position:absolute; left:128px; top:884px; width:760px; font-size:38px; color:#7b6f66">Higher <b style="color:#241d19">res</b></p>
+
+  <x-embed data-build-in="fade 1" style="position:absolute; left:952px; top:176px; width:840px; height:764px"><style>
+html,body{margin:0;height:100%;background:#fbf7f0;overflow:hidden;font-family:ui-monospace,Menlo,Consolas,monospace;color:#7b6f66}
+#c{display:block}#p{text-align:center;font-size:26px;padding-top:8px}
+</style><canvas id="c" width="840" height="712"></canvas><div id="p">a grid</div><script>
+var g=document.getElementById('c').getContext('2d'),N=33,CS=21,X0=74,Y0=8,row=0;
+function cell(i,j){g.fillStyle='#FFFFFF';g.fillRect(X0+i*CS,Y0+j*CS,CS,CS);
+ g.strokeStyle='#e8dccb';g.lineWidth=1;g.strokeRect(X0+i*CS+.5,Y0+j*CS+.5,CS-1,CS-1);}
+function step(){for(var n=0;n<2&&row<N;n++,row++)for(var i=0;i<N;i++)cell(i,row);
+ if(row<N)requestAnimationFrame(step);}
+function start(){requestAnimationFrame(step);}
+// A build waiting to be revealed is visibility:hidden, so nothing in here gets
+// painted until the click. The first paint is the click.
+(function(){var d=false;function go(){if(d)return;d=true;start();}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf('paint')<0)throw 0;
+  var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});
+  po.observe({type:'paint',buffered:true});}catch(_){go();}})();
+</script></x-embed>
+
+  <x-embed data-build-in="fade 2" style="position:absolute; left:952px; top:176px; width:840px; height:764px"><style>
+html,body{margin:0;height:100%;background:#fbf7f0;overflow:hidden;font-family:ui-monospace,Menlo,Consolas,monospace;color:#7b6f66}
+#c{display:block}#p{text-align:center;font-size:26px;padding-top:8px}
+</style><canvas id="c" width="840" height="712"></canvas><div id="p">white or black</div><script>
+var g=document.getElementById('c').getContext('2d'),N=33,CS=21,X0=74,Y0=8,PER=4;
+function cell(k,black){var i=k%N,j=(k/N)|0;
+ g.fillStyle=black?'#241d19':'#FFFFFF';g.fillRect(X0+i*CS,Y0+j*CS,CS,CS);
+ g.strokeStyle='#e8dccb';g.lineWidth=1;g.strokeRect(X0+i*CS+.5,Y0+j*CS+.5,CS-1,CS-1);}
+for(var k0=0;k0<N*N;k0++)cell(k0,false);            // blank board is the first frame
+var ord=[],at=0,phase=0,hold=0;
+function start(){
+ for(var k=0;k<N*N;k++)if(Math.random()<0.2)ord.push(k);
+ for(var q=ord.length-1;q>0;q--){var r=(Math.random()*(q+1))|0,t=ord[q];ord[q]=ord[r];ord[r]=t;}
+ setTimeout(function(){requestAnimationFrame(step);},500);}   // half a second on the blank board first
+function step(){
+ if(phase===0){for(var n=0;n<PER&&at<ord.length;n++)cell(ord[at++],true);   // fill in
+  if(at>=ord.length){phase=1;hold=performance.now();}}
+ else if(phase===1){if(performance.now()-hold>1000)phase=2;}                 // sustain
+ else{for(var n=0;n<PER&&at>0;n++)cell(ord[--at],false);                     // take it away
+  if(at<=0)return;}
+ requestAnimationFrame(step);}
+(function(){var d=false;function go(){if(d)return;d=true;start();}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf('paint')<0)throw 0;
+  var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});
+  po.observe({type:'paint',buffered:true});}catch(_){go();}})();
+</script></x-embed>
+
+  <x-embed data-build-in="fade 3" style="position:absolute; left:952px; top:176px; width:840px; height:764px"><style>
+html,body{margin:0;height:100%;background:#fbf7f0;overflow:hidden;font-family:ui-monospace,Menlo,Consolas,monospace;color:#7b6f66}
+#c{display:block}#p{text-align:center;font-size:26px;padding-top:8px}
+</style><canvas id="c" width="840" height="712"></canvas><div id="p">a position</div><script>
+var g=document.getElementById('c').getContext('2d'),N=33,CS=21,X0=74,Y0=8,M=(N/2)|0;
+for(var j=0;j<N;j++)for(var i=0;i<N;i++){g.fillStyle='#FFFFFF';g.fillRect(X0+i*CS,Y0+j*CS,CS,CS);
+ g.strokeStyle='#e8dccb';g.lineWidth=1;g.strokeRect(X0+i*CS+.5,Y0+j*CS+.5,CS-1,CS-1);}
+var rx=X0+M*CS,ry=Y0+M*CS,cx=rx+CS/2,cy=ry+CS/2,t0=0;
+function f(t){var r=5+1.6*Math.sin((t-t0)/1000*3);   // stays inside its own cell
+ g.fillStyle='#FFFFFF';g.fillRect(rx,ry,CS,CS);
+ g.strokeStyle='#e8dccb';g.lineWidth=1;g.strokeRect(rx+.5,ry+.5,CS-1,CS-1);
+ g.fillStyle='#b00300';g.beginPath();g.arc(cx,cy,r,0,6.284);g.fill();
+ requestAnimationFrame(f);}
+function start(){t0=performance.now();requestAnimationFrame(f);}
+(function(){var d=false;function go(){if(d)return;d=true;start();}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf('paint')<0)throw 0;
+  var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});
+  po.observe({type:'paint',buffered:true});}catch(_){go();}})();
+</script></x-embed>
+
+  <x-embed data-build-in="fade 4" style="position:absolute; left:952px; top:176px; width:840px; height:764px"><style>
+html,body{margin:0;height:100%;background:#fbf7f0;overflow:hidden;font-family:ui-monospace,Menlo,Consolas,monospace;color:#7b6f66}
+#c{display:block}#p{text-align:center;font-size:26px;padding-top:8px}
+</style><canvas id="c" width="840" height="712"></canvas><div id="p">a direction</div><script>
+var g=document.getElementById('c').getContext('2d'),N=33,CS=21,X0=74,Y0=8,M=(N/2)|0;
+var cx=X0+M*CS+CS/2,cy=Y0+M*CS+CS/2,ang=0,want=0,last=0,held=0,turns=0;
+function grid(){for(var j=0;j<N;j++)for(var i=0;i<N;i++){g.fillStyle='#FFFFFF';
+ g.fillRect(X0+i*CS,Y0+j*CS,CS,CS);
+ g.strokeStyle='#e8dccb';g.lineWidth=1;g.strokeRect(X0+i*CS+.5,Y0+j*CS+.5,CS-1,CS-1);}}
+function ant(){g.save();g.translate(cx,cy);g.rotate(ang);g.fillStyle='#b00300';g.beginPath();
+ g.moveTo(0,-9);g.lineTo(7,8);g.lineTo(0,4);g.lineTo(-7,8);g.closePath();g.fill();g.restore();}
+grid();ant();                                        // pointing up is the first frame
+function f(now){var dt=now-last;last=now;
+ if(Math.abs(want-ang)<0.003){ang=want;held+=dt;
+  if(held>700){if(turns>=4){grid();ant();return;}   // four quarter turns, then rest
+   held=0;want+=Math.PI/2;turns++;}}
+ else ang+=(want-ang)*Math.min(1,dt/160);
+ grid();ant();requestAnimationFrame(f);}
+function start(){last=performance.now();requestAnimationFrame(f);}
+(function(){var d=false;function go(){if(d)return;d=true;start();}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf('paint')<0)throw 0;
+  var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});
+  po.observe({type:'paint',buffered:true});}catch(_){go();}})();
+</script></x-embed>
+
+  <x-embed data-build-in="fade 6" style="position:absolute; left:952px; top:176px; width:840px; height:764px"><style>
+html,body{margin:0;height:100%;background:#fbf7f0;overflow:hidden;font-family:ui-monospace,Menlo,Consolas,monospace;color:#7b6f66}
+#c{display:block}#p{text-align:center;font-size:26px;padding-top:8px}#p b{color:#241d19;font-weight:700}
+</style><canvas id="c" width="840" height="712"></canvas><div id="p">step <b>0</b></div><script>
+var g=document.getElementById('c').getContext('2d'),p=document.getElementById('p');
+var N=33,CS=21,X0=74,Y0=8,DX=[0,1,0,-1],DY=[-1,0,1,0];
+var s=new Uint8Array(N*N),x=(N/2)|0,y=(N/2)|0,dir=0,n=0;
+function cell(i,j,c){g.fillStyle=c;g.fillRect(X0+i*CS,Y0+j*CS,CS,CS);
+ g.strokeStyle='#e8dccb';g.lineWidth=1;g.strokeRect(X0+i*CS+.5,Y0+j*CS+.5,CS-1,CS-1);}
+function ant(){                                     // fits inside one cell, so
+ g.save();                                          // repainting that cell clears it
+ g.translate(X0+x*CS+CS/2,Y0+y*CS+CS/2);g.rotate(dir*Math.PI/2);
+ g.fillStyle='#b00300';g.beginPath();
+ g.moveTo(0,-9);g.lineTo(7,8);g.lineTo(0,4);g.lineTo(-7,8);g.closePath();g.fill();g.restore();}
+for(var j=0;j<N;j++)for(var i=0;i<N;i++)cell(i,j,'#FFFFFF');
+ant();                                              // blank board, ant in the centre
+function start(){
+ setTimeout(function(){                             // a beat on the blank board first
+  setInterval(function(){var k=y*N+x,c=s[k];
+   dir=(dir+(c?3:1))%4;s[k]=c?0:1;cell(x,y,c?'#FFFFFF':'#241d19');
+   x=(x+DX[dir]+N)%N;y=(y+DY[dir]+N)%N;ant();
+   p.innerHTML='step <b>'+(++n)+'</b>';},130);},600);}
+(function(){var d=false;function go(){if(d)return;d=true;start();}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf('paint')<0)throw 0;
+  var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});
+  po.observe({type:'paint',buffered:true});}catch(_){go();}})();
+</script></x-embed>
+
+  <x-embed data-build-in="fade 7" style="position:absolute; left:952px; top:176px; width:840px; height:764px"><style>
+html,body{margin:0;height:100%;background:#fbf7f0;overflow:hidden;font-family:ui-monospace,Menlo,Consolas,monospace;color:#7b6f66}
+#c{display:block}#p{text-align:center;font-size:26px;padding-top:8px}#p b{color:#241d19;font-weight:700}
+</style><canvas id="c" width="840" height="712"></canvas><div id="p">step <b>0</b></div><script>
+var g=document.getElementById('c').getContext('2d'),p=document.getElementById('p');
+var CS=3,W=231,H=231,X0=74,Y0=8,PER=14,DX=[0,1,0,-1],DY=[-1,0,1,0];   // the same 693px square as before
+var s=new Uint8Array(W*H),x=W>>1,y=H>>1,dir=0,n=0,alive=true;
+g.fillStyle='#FFFFFF';g.fillRect(X0,Y0,W*CS,H*CS);
+g.strokeStyle='#e8dccb';g.lineWidth=1;g.strokeRect(X0+.5,Y0+.5,W*CS-1,H*CS-1);
+function ant(){g.fillStyle='#b00300';g.fillRect(X0+x*CS,Y0+y*CS,CS,CS);}
+ant();                                              // same start: blank board, centre, facing up
+function frame(){
+ for(var i=0;i<PER&&alive;i++){
+  var k=y*W+x,c=s[k];
+  dir=(dir+(c?3:1))%4;s[k]=c?0:1;
+  g.fillStyle=c?'#FFFFFF':'#241d19';g.fillRect(X0+x*CS,Y0+y*CS,CS,CS);
+  x+=DX[dir];y+=DY[dir];n++;
+  if(x<0||y<0||x>=W||y>=H){alive=false;break;}     // the highway has left the board
+ }
+ if(alive)ant();
+ p.innerHTML='step <b>'+n+'</b>';
+ if(alive)requestAnimationFrame(frame);}
+function start(){setTimeout(function(){requestAnimationFrame(frame);},400);}
+(function(){var d=false;function go(){if(d)return;d=true;start();}
+ try{if(PerformanceObserver.supportedEntryTypes.indexOf('paint')<0)throw 0;
+  var po=new PerformanceObserver(function(l){if(l.getEntries().length){po.disconnect();go();}});
+  po.observe({type:'paint',buffered:true});}catch(_){go();}})();
+</script></x-embed>
+
+  <p style="position:absolute; left:128px; bottom:64px; width:800px; font-family:'JetBrains Mono', 'Courier New', monospace; font-size:24px; color:#7b6f66">read more: <a href="https://en.wikipedia.org/wiki/Langton%27s_ant" style="color:#b00300">en.wikipedia.org/wiki/Langton's_ant</a></p>
+  <aside>Seven clicks on one slide. The rule appears on the fifth; the sixth starts it. Each stage starts the moment its click reveals it: the board fills and empties once, the ant turns through all four headings once, the click after the rule starts it from the centre. The seventh click switches to a fine board running about 840 steps a second: chaos for ten or eleven seconds, then the highway appears and runs off the edge.</aside>
+</section>
