@@ -156,6 +156,8 @@ h1 {
 /* the link to the lab: the site's own button, worn by an <a> */
 .labgo { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px 18px; margin: 0 0 0 auto; text-align: right; }
 .labgo .talks { display: flex; flex-direction: column; gap: 4px; }
+.labgo .talk-note { font-size: 12px; color: var(--muted); }
+.labgo .talk-links { display: flex; justify-content: flex-end; gap: 14px; }
 .labgo a {
   display: inline-block;
   padding: 8px 14px;
