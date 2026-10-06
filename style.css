@@ -145,16 +145,16 @@ h1 {
 
 .lede-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 28px;
   flex-wrap: wrap;
   margin-bottom: 28px;
 }
-.lede-row .lede { margin-bottom: 0; max-width: 34em; }
+.lede-row .lede { flex: 1 1 20em; margin-bottom: 0; max-width: 34em; }
 
 /* the link to the lab: the site's own button, worn by an <a> */
-.labgo { margin-left: auto; text-align: right; }
+.labgo { flex: none; margin: 0 0 0 auto; text-align: right; }
 .labgo a {
   display: inline-block;
   padding: 8px 14px;
